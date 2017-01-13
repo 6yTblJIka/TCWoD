@@ -20,6 +20,7 @@
 #define __WORLDSOCKET_H__
 
 #include "Common.h"
+#include "QueryCallbackProcessor.h"
 #include "WorldPacketCrypt.h"
 #include "ServerPktHeader.h"
 #include "Socket.h"
@@ -154,8 +155,7 @@ private:
 
     z_stream_s* _compressionStream;
 
-    PreparedQueryResultFuture _queryFuture;
-    std::function<void(PreparedQueryResult&&)> _queryCallback;
+    QueryCallbackProcessor _queryProcessor;
     std::string _ipCountry;
 };
 
