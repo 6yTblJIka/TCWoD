@@ -14481,6 +14481,8 @@ void Player::RewardQuest(Quest const* quest, uint32 reward, Object* questGiver, 
 
         if (moneyRew > 0)
             UpdateCriteria(CRITERIA_TYPE_MONEY_FROM_QUEST_REWARD, uint32(moneyRew));
+
+        SendDisplayToast(0, DisplayToastType::Money, false, moneyRew, DisplayToastMethod::QuestComplete);
     }
 
     // honor reward
@@ -26586,4 +26588,34 @@ bool Player::MeetPlayerCondition(uint32 conditionId) const
             return false;
 
     return true;
+}
+
+void Player::SendDisplayToast(uint32 entry, DisplayToastType type, bool isBonusRoll, uint32 quantity, DisplayToastMethod method, Item* item /*= nullptr*/) const
+{
+    WorldPackets::Misc::DisplayToast displayToast;
+    displayToast.Quantity = quantity;
+    displayToast.DisplayToastMethod = method;
+    displayToast.Type = type;
+
+    switch (type)
+    {
+    case DisplayToastType::NewItem:
+    {
+        if (!item)
+            return;
+
+        displayToast.BonusRoll = isBonusRoll;
+        displayToast.Item.Initialize(item);
+        displayToast.LootSpec = 0; // loot spec that was selected when loot was generated (not at loot time)
+        displayToast.Gender = Gender(getGender());
+        break;
+    }
+    case DisplayToastType::NewCurrency:
+        displayToast.CurrencyID = entry;
+        break;
+    default:
+        break;
+    }
+
+    SendDirectMessage(displayToast.Write());
 }
