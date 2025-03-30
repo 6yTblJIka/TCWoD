@@ -5000,7 +5000,6 @@ void Player::UpdateRating(CombatRating cr)
 
     switch (cr)
     {
-        case CR_UNUSED_1:
         case CR_DEFENSE_SKILL:
             break;
         case CR_DODGE:
