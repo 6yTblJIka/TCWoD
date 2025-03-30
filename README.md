@@ -1,13 +1,22 @@
 # ![logo](https://community.trinitycore.org/public/style_images/1_trinitycore.png) TrinityCore
 
-[![Issue Stats](http://www.issuestats.com/github/TrinityCore/TrinityCore/badge/issue)](http://www.issuestats.com/github/TrinityCore/TrinityCore) [![Issue Stats](http://www.issuestats.com/github/TrinityCore/TrinityCore/badge/pr)](http://www.issuestats.com/github/TrinityCore/TrinityCore) [![Bountysource](https://www.bountysource.com/badge/tracker?tracker_id=1310)](https://www.bountysource.com/trackers/1310-trinity-core?utm_source=1310&utm_medium=shield&utm_campaign=TRACKER_BADGE)
-
 ## Build Status
+Built successfully on Windows with:
 
-6.x | 3.3.5
-:------------: | :------------:
-[![6.x Build Status](https://travis-ci.org/TrinityCore/TrinityCore.svg?branch=6.x)](https://travis-ci.org/TrinityCore/TrinityCore) | [![3.3.5 Build Status](https://travis-ci.org/TrinityCore/TrinityCore.svg?branch=3.3.5)](https://travis-ci.org/TrinityCore/TrinityCore)
-[![Coverity Scan Build Status](https://scan.coverity.com/projects/435/badge.svg)](https://scan.coverity.com/projects/435) | [![Coverity Scan Build Status](https://scan.coverity.com/projects/4656/badge.svg)](https://scan.coverity.com/projects/4656)
+- Boost 1.80.0
+- MySQL 8.0.41
+- OpenSSL 3.4.1
+- CMake 3.31.5
+- Microsoft Visual Studio 2022 (Version 17.13.4)
+
+Built successfully on Linux (Debian 12) with:
+
+- Boost 1.74.0.3
+- MariaDB 10.11.11
+- OpenSSL 3.0.15
+- CMake 3.25.1
+- GCC 12.2.0-14
+- Clang 14.0.6
 
 ## Introduction
 
