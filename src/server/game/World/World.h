@@ -37,6 +37,10 @@
 #include <set>
 #include <list>
 
+#ifdef ELUNA
+class Eluna;
+#endif
+
 class Object;
 class WorldPacket;
 class WorldSession;
@@ -903,6 +907,12 @@ class TC_GAME_API World
 
         void ProcessQueryCallbacks();
         QueryCallbackProcessor _queryProcessor;
+
+#ifdef ELUNA
+    public:
+        Eluna* GetEluna() const { return eluna; }
+        Eluna* eluna;
+#endif
 };
 
 TC_GAME_API extern Realm realm;

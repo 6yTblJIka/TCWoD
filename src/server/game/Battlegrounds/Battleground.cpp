@@ -107,6 +107,10 @@ namespace Trinity
     };
 } // namespace Trinity
 
+#ifdef ELUNA
+#include "LuaEngine.h"
+#endif
+
 template<class Do>
 void Battleground::BroadcastWorker(Do& _do)
 {
@@ -524,6 +528,11 @@ inline void Battleground::_ProcessJoin(uint32 diff)
     {
         m_Events |= BG_STARTING_EVENT_4;
 
+#ifdef ELUNA
+        if (Eluna* e = GetBgMap()->GetEluna())
+            e->OnBGStart(this, GetTypeID(), GetInstanceID());
+#endif
+
         StartingEventOpenDoors();
 
         SendMessageToAll(StartMessageIds[BG_STARTING_EVENT_FOURTH], CHAT_MSG_RAID_BOSS_EMOTE);
@@ -899,6 +908,12 @@ void Battleground::EndBattleground(uint32 winner)
 
         player->UpdateCriteria(CRITERIA_TYPE_COMPLETE_BATTLEGROUND, 1);
     }
+
+#ifdef ELUNA
+    //the type of the winner,change Team to BattlegroundTeamId,it could be better.
+    if (Eluna* e = GetBgMap()->GetEluna())
+        e->OnBGEnd(this, GetTypeID(), GetInstanceID(), Team(winner));
+#endif
 
     if (winmsg_id)
         SendMessageToAll(winmsg_id, CHAT_MSG_BG_SYSTEM_NEUTRAL);

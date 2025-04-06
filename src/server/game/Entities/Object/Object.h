@@ -75,6 +75,12 @@ enum NotifyFlags
     NOTIFY_ALL                      = 0xFF
 };
 
+#ifdef ELUNA
+#include "LuaValue.h"
+class ElunaEventProcessor;
+class Eluna;
+#endif
+
 class Corpse;
 class Creature;
 class CreatureAI;
@@ -696,6 +702,15 @@ class TC_GAME_API WorldObject : public Object, public WorldLocation
         bool CanDetect(WorldObject const* obj, bool ignoreStealth, bool checkAlert = false) const;
         bool CanDetectInvisibilityOf(WorldObject const* obj) const;
         bool CanDetectStealthOf(WorldObject const* obj, bool checkAlert = false) const;
+
+#ifdef ELUNA
+    public:
+        ElunaEventProcessor* elunaEvents;
+
+        Eluna* GetEluna() const;
+
+        LuaVal lua_data = LuaVal({});
+#endif
 };
 
 namespace Trinity

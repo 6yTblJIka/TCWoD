@@ -219,6 +219,28 @@ private:
     T* _dataTableEx;
     StringPoolList _stringPoolList;
     HotfixDatabaseStatements _hotfixStatement;
+
+#ifdef ELUNA
+public:
+    void SetEntry(uint32 id, T* t)
+    {
+        if (id >= _indexTableSize)
+        {
+            // Resize
+            typedef char* ptr;
+            size_t newSize = id + 1;
+            ptr* newArr = new ptr[newSize];
+            memset(newArr, 0, newSize * sizeof(ptr));
+            memcpy(newArr, _indexTable.AsChar, _indexTableSize * sizeof(ptr));
+            delete[] reinterpret_cast<char*>(_indexTable.AsT);
+            _indexTable.AsT = reinterpret_cast<T**>(newArr);
+            _indexTableSize = newSize;
+        }
+
+        delete _indexTable.AsT[id];
+        _indexTable.AsT[id] = t;
+    }
+#endif
 };
 
 #endif

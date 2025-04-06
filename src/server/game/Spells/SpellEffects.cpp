@@ -62,6 +62,10 @@
 #include "MiscPackets.h"
 #include "SpellPackets.h"
 
+#ifdef ELUNA
+#include "LuaEngine.h"
+#endif
+
 pEffect SpellEffects[TOTAL_SPELL_EFFECTS]=
 {
     &Spell::EffectNULL,                                     //  0
@@ -595,6 +599,18 @@ void Spell::EffectDummy(SpellEffIndex effIndex)
         sScriptMgr->OnDummyEffect(m_caster, m_spellInfo->Id, effIndex, unitTarget->ToCreature());
     else if (itemTarget)
         sScriptMgr->OnDummyEffect(m_caster, m_spellInfo->Id, effIndex, itemTarget);
+
+#ifdef ELUNA
+        if (Eluna* e = m_caster->GetEluna())
+        {
+            if (gameObjTarget)
+                e->OnDummyEffect(m_caster, m_spellInfo->Id, effIndex, gameObjTarget);
+            else if (unitTarget && unitTarget->GetTypeId() == TYPEID_UNIT)
+                e->OnDummyEffect(m_caster, m_spellInfo->Id, effIndex, unitTarget->ToCreature());
+            else if (itemTarget)
+                e->OnDummyEffect(m_caster, m_spellInfo->Id, effIndex, itemTarget);
+        }
+#endif
 }
 
 void Spell::EffectTriggerSpell(SpellEffIndex /*effIndex*/)

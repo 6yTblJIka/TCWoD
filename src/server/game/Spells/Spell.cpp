@@ -58,6 +58,10 @@
 #include "SpellHistory.h"
 #include "TradeData.h"
 
+#ifdef ELUNA
+#include "LuaEngine.h"
+#endif
+
 extern pEffect SpellEffects[TOTAL_SPELL_EFFECTS];
 
 SpellDestination::SpellDestination()
@@ -3146,6 +3150,11 @@ void Spell::cast(bool skipCheck)
 
     if (m_isDelayedInstantCast)
         SendSpellStart();
+
+#ifdef ELUNA
+    if (Eluna* e = m_caster->GetEluna())
+        e->OnSpellCast(this, skipCheck);
+#endif
 
     if (Player* playerCaster = m_caster->ToPlayer())
     {

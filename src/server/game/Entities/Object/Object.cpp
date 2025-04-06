@@ -46,6 +46,12 @@
 #include "GameObjectPackets.h"
 #include "MiscPackets.h"
 
+#ifdef ELUNA
+#include "LuaEngine.h"
+#include "ElunaConfig.h"
+#include "ElunaEventMgr.h"
+#endif
+
 Object::Object()
 {
     m_objectTypeId      = TYPEID_OBJECT;
@@ -75,6 +81,11 @@ WorldObject::~WorldObject()
             ABORT();
         }
         ResetMap();
+
+#ifdef ELUNA
+        delete elunaEvents;
+        elunaEvents = NULL;
+#endif
     }
 }
 
@@ -1441,6 +1452,9 @@ WorldObject::WorldObject(bool isWorldObject) : WorldLocation(), LastUsedScriptID
 m_name(""), m_isActive(false), m_isWorldObject(isWorldObject), m_zoneScript(NULL),
 m_transport(NULL), m_currMap(NULL), m_InstanceId(0),
 m_phaseMask(PHASEMASK_NORMAL), _dbPhase(0), m_notifyflags(0), m_executed_notifies(0)
+#ifdef ELUNA
+, elunaEvents(NULL)
+#endif
 {
     m_serverSideVisibility.SetValue(SERVERSIDE_VISIBILITY_GHOST, GHOST_VISIBILITY_ALIVE | GHOST_VISIBILITY_GHOST);
     m_serverSideVisibilityDetect.SetValue(SERVERSIDE_VISIBILITY_GHOST, GHOST_VISIBILITY_ALIVE);
@@ -2175,6 +2189,23 @@ void WorldObject::SetMap(Map* map)
     m_currMap = map;
     m_mapId = map->GetId();
     m_InstanceId = map->GetInstanceId();
+
+#ifdef ELUNA
+    //@todo: possibly look into cleanly clearing all pending events from previous map's event mgr.
+
+    // if multistate, delete elunaEvents and set to nullptr. events shouldn't move across states.
+    // in single state, the timed events should move across maps
+    if (!sElunaConfig->IsElunaCompatibilityMode())
+    {
+        delete elunaEvents;
+        elunaEvents = nullptr; // set to null in case map doesn't use eluna
+    }
+
+    if (Eluna* e = map->GetEluna())
+        if (!elunaEvents)
+            elunaEvents = new ElunaEventProcessor(e, this);
+#endif
+
     if (IsWorldObject())
         m_currMap->AddWorldObject(this);
 }
@@ -3162,3 +3193,13 @@ void WorldObject::RebuildWorldMapAreaSwaps()
                         for (uint32 worldMapAreaId : *uiMapSwaps)
                             _worldMapAreaSwaps.insert(worldMapAreaId);
 }
+
+#ifdef ELUNA
+Eluna* WorldObject::GetEluna() const
+{
+    if (const Map* map = FindMap())
+        return map->GetEluna();
+
+    return nullptr;
+}
+#endif

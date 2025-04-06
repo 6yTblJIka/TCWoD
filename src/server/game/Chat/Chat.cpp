@@ -33,6 +33,10 @@
 #include "ChatLink.h"
 #include "Group.h"
 
+#ifdef ELUNA
+#include "LuaEngine.h"
+#endif
+
 // Lazy loading of the command table cache from commands and the
 // ScriptMgr should be thread safe since the player commands,
 // cli commands and ScriptMgr updates are all dispatched one after
@@ -331,6 +335,12 @@ bool ChatHandler::ExecuteCommandInTable(std::vector<ChatCommand> const& table, c
 
         return true;
     }
+
+#ifdef ELUNA
+    if (Eluna* e = sWorld->GetEluna())
+        if (!e->OnCommand(m_session ? nullptr : m_session->GetPlayer(), fullcmd.c_str()))
+            return true;
+#endif
 
     return false;
 }

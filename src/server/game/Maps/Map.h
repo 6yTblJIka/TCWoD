@@ -36,6 +36,11 @@
 #include <list>
 #include <memory>
 
+#ifdef ELUNA
+#include "LuaValue.h"
+class Eluna;
+#endif
+
 class Unit;
 class WorldPacket;
 class InstanceScript;
@@ -744,6 +749,14 @@ class TC_GAME_API Map : public GridRefManager<NGridType>
         std::unordered_set<Corpse*> _corpseBones;
 
         std::unordered_set<Object*> _updateObjects;
+
+#ifdef ELUNA
+        /*private:*/
+        Eluna* eluna;
+    public:
+        Eluna* GetEluna() const;
+        LuaVal lua_data = LuaVal({});
+#endif
 };
 
 enum InstanceResetMethod

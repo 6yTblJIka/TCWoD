@@ -36,6 +36,11 @@
 #include "Opcodes.h"
 #include "MiscPackets.h"
 
+#ifdef ELUNA
+#include "LuaEngine.h"
+#include "ElunaConfig.h"
+#endif
+
 MapManager::MapManager()
     : _nextInstanceId(0), _scheduledScripts(0)
 {
@@ -50,6 +55,16 @@ void MapManager::Initialize()
     Map::InitStateMachine();
 
     int num_threads(sWorld->getIntConfig(CONFIG_NUMTHREADS));
+
+#ifdef ELUNA
+    if (sElunaConfig->IsElunaEnabled() && sElunaConfig->IsElunaCompatibilityMode() && num_threads > 4)
+    {
+        // Force 1 thread for Eluna if compatibility mode is enabled. Compatibility mode is single state and does not allow more update threads.
+        TC_LOG_ERROR("maps", "Map update threads set to {}, when Eluna in compatibility mode only allows 4, changing to 4", num_threads);
+        num_threads = 4;
+    }
+#endif
+
     // Start mtmaps if needed.
     if (num_threads > 0)
         m_updater.activate(num_threads);
@@ -364,6 +379,11 @@ uint32 MapManager::GenerateInstanceId()
 
 void MapManager::FreeInstanceId(uint32 instanceId)
 {
+#ifdef ELUNA
+    if (Eluna* e = sWorld->GetEluna())
+        e->FreeInstanceId(instanceId);
+#endif
+
     // If freed instance id is lower than the next id available for new instances, use the freed one instead
     if (instanceId < _nextInstanceId)
         SetNextInstanceId(instanceId);

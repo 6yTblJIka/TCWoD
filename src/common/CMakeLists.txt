@@ -99,3 +99,9 @@ endif()
 if (USE_COREPCH)
   add_cxx_pch(common ${PRIVATE_PCH_HEADER} ${PRIVATE_PCH_SOURCE})
 endif ()
+
+if (ELUNA)
+	target_link_libraries(common
+	 PUBLIC
+	   lualib)
+endif()

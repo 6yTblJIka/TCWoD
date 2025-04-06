@@ -38,6 +38,10 @@
 #include "PartyPackets.h"
 #include "LootPackets.h"
 
+#ifdef ELUNA
+#include "LuaEngine.h"
+#endif
+
 Roll::Roll(ObjectGuid _guid, LootItem const& li) : itemGUID(_guid), itemid(li.itemid),
 itemRandomPropId(li.randomPropertyId), itemRandomSuffix(li.randomSuffix), itemCount(li.count),
 totalPlayersRolling(0), totalNeed(0), totalGreed(0), totalPass(0), itemSlot(0),
@@ -163,6 +167,11 @@ bool Group::Create(Player* leader)
     }
     else if (!AddMember(leader))
         return false;
+
+#ifdef ELUNA
+    if (Eluna* e = leader->GetEluna())
+        e->OnCreate(this, m_leaderGuid);
+#endif
 
     return true;
 }

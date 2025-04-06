@@ -32,6 +32,10 @@
 #include "GameObjectAI.h"
 #include "QuestPackets.h"
 
+#ifdef ELUNA
+#include "LuaEngine.h"
+#endif
+
 void WorldSession::HandleQuestgiverStatusQueryOpcode(WorldPackets::Quest::QuestGiverStatusQuery& packet)
 {
     uint32 questStatus = DIALOG_STATUS_NONE;
@@ -84,6 +88,12 @@ void WorldSession::HandleQuestgiverHelloOpcode(WorldPackets::Quest::QuestGiverHe
         GetPlayer()->RemoveAurasByType(SPELL_AURA_FEIGN_DEATH);
     // Stop the npc if moving
     creature->StopMoving();
+
+#ifdef ELUNA
+    if (Eluna* e = GetPlayer()->GetEluna())
+        if (e->OnGossipHello(_player, creature))
+            return;
+#endif
 
     if (sScriptMgr->OnGossipHello(_player, creature))
         return;
