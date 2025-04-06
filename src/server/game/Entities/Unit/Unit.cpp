@@ -9373,14 +9373,14 @@ void Unit::CombatStart(Unit* target, bool initialAggro)
         && (who->GetTypeId() != TYPEID_PLAYER
         || !me->duel || me->duel->opponent != who))
     {
-        me->UpdatePvP(true);
+        me->UpdatePvP(true); 
         me->RemoveAurasWithInterruptFlags(AURA_INTERRUPT_FLAG_ENTER_PVP_COMBAT);
     }
 
 #ifdef ELUNA
-    if (Player* player = me->ToPlayer())
-        if (Eluna* e = player->GetEluna())
-            e->OnPlayerEnterCombat(player, target);
+    if (me)
+        if (Eluna* e = me->GetEluna())
+            e->OnPlayerEnterCombat(me, target);
 #endif
 }
 
