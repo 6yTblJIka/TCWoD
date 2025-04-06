@@ -76,29 +76,16 @@ if(USE_COREPCH)
 endif()
 
 if( ELUNA )
-  if( WIN32 )
-    if ( MSVC )
-      add_custom_command(TARGET game
-        POST_BUILD
-        COMMAND ${CMAKE_COMMAND} -E make_directory ${CMAKE_BINARY_DIR}/bin/$(ConfigurationName)/lua_scripts/extensions/
-        COMMAND ${CMAKE_COMMAND} -E copy_directory ${CMAKE_CURRENT_SOURCE_DIR}/LuaEngine/extensions ${CMAKE_BINARY_DIR}/bin/$(ConfigurationName)/lua_scripts/extensions/
-      )
-    elseif ( MINGW )
-      add_custom_command(TARGET game
-        POST_BUILD
-        COMMAND ${CMAKE_COMMAND} -E make_directory ${CMAKE_BINARY_DIR}/bin/lua_scripts/extensions/
-        COMMAND ${CMAKE_COMMAND} -E copy_directory ${CMAKE_CURRENT_SOURCE_DIR}/LuaEngine/extensions ${CMAKE_BINARY_DIR}/bin/lua_scripts/extensions/
-      )
+    if( WIN32 )
+        add_custom_command(TARGET game
+          POST_BUILD
+          COMMAND ${CMAKE_COMMAND} -E copy_directory ${CMAKE_CURRENT_SOURCE_DIR}/LuaEngine/lua_scripts ${CMAKE_BINARY_DIR}/bin/$(ConfigurationName)/lua_scripts/
+        )
     endif()
-  endif()
 
-  #target_link_libraries(game-interface
-  #  INTERFACE
-  #    lualib)
-
-  if( UNIX )
-    install(DIRECTORY LuaEngine/extensions DESTINATION bin/lua_scripts/)
-  elseif( WIN32 )
-    install(DIRECTORY LuaEngine/extensions DESTINATION "${CMAKE_BINARY_DIR}/bin/$(ConfigurationName)/lua_scripts/")
-  endif()
+    if (UNIX)
+      install(DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/LuaEngine/lua_scripts DESTINATION bin)
+    elseif (WIN32)
+      install(DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/LuaEngine/lua_scripts DESTINATION "${CMAKE_INSTALL_PREFIX}")
+    endif()
 endif()
