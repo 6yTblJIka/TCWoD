@@ -17,13 +17,31 @@
 
 #include "ARC4.h"
 #include "Errors.h"
+#include <openssl/err.h>
+#include <openssl/provider.h>
 
 ARC4::ARC4(uint32 len) : _ctx(EVP_CIPHER_CTX_new())
 {
 #if OPENSSL_VERSION_NUMBER >= 0x30000000L
+    // Load the legacy provider
+    OSSL_PROVIDER* legacy = OSSL_PROVIDER_load(nullptr, "legacy");
+    if (!legacy)
+    {
+        // Handle error
+        ERR_print_errors_fp(stderr);
+        printf("Error: legacy.dll is missing. Failed to load legacy provider.\n");
+        printf("You can find by default in OpenSSL-Win64 bin directory.\n");
+    }
+
     _cipher = EVP_CIPHER_fetch(nullptr, "RC4", nullptr);
+    if (!_cipher)
+    {
+        // Handle error
+        ERR_print_errors_fp(stderr);
+        printf("Error: Failed to fetch RC4 cipher\n");
+    }
 #else
-    EVP_CIPHER const *_cipher = EVP_rc4();
+    EVP_CIPHER const* _cipher = EVP_rc4();
 #endif
 
     EVP_CIPHER_CTX_init(_ctx);
@@ -34,9 +52,25 @@ ARC4::ARC4(uint32 len) : _ctx(EVP_CIPHER_CTX_new())
 ARC4::ARC4(uint8* seed, uint32 len) : _ctx(EVP_CIPHER_CTX_new())
 {
 #if OPENSSL_VERSION_NUMBER >= 0x30000000L
+    // Load the legacy provider
+    OSSL_PROVIDER* legacy = OSSL_PROVIDER_load(nullptr, "legacy");
+    if (!legacy)
+    {
+        // Handle error
+        ERR_print_errors_fp(stderr);
+        printf("Error: legacy.dll is missing. Failed to load legacy provider.\n");
+        printf("You can find by default in OpenSSL-Win64 bin directory.\n");
+    }
+
     _cipher = EVP_CIPHER_fetch(nullptr, "RC4", nullptr);
+    if (!_cipher)
+    {
+        // Handle error
+        ERR_print_errors_fp(stderr);
+        printf("Error: Failed to fetch RC4 cipher\n");
+    }
 #else
-    EVP_CIPHER const *_cipher = EVP_rc4();
+    EVP_CIPHER const* _cipher = EVP_rc4();
 #endif
 
     EVP_CIPHER_CTX_init(_ctx);
