@@ -34,6 +34,8 @@ extern void RegisterFunctions(Eluna* E);
 
 void Eluna::_ReloadEluna()
 {
+    sWorld->SendServerMessage(SERVER_MSG_STRING, "Reloading Eluna...");
+
     // Remove all timed events
     eventMgr->SetStates(LUAEVENT_STATE_ERASE);
 
@@ -47,6 +49,8 @@ void Eluna::_ReloadEluna()
     RunScripts();
 
     reload = false;
+
+    sWorld->SendServerMessage(SERVER_MSG_STRING, "Eluna reloaded...");
 }
 
 Eluna::Eluna(Map* map, bool compatMode) :
