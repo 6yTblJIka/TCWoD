@@ -76,7 +76,7 @@ bool Eluna::OnCommand(Player* player, const char* text)
     {
         std::string reload = text;
         std::transform(reload.begin(), reload.end(), reload.begin(), ::tolower);
-        const std::string reload_command = "reload eluna";
+        const std::string reload_command = ".reload eluna";
         if (reload.find(reload_command) == 0)
         {
             const int mapid_reload_cache_only = -3;

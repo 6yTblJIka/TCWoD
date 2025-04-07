@@ -338,7 +338,7 @@ bool ChatHandler::ExecuteCommandInTable(std::vector<ChatCommand> const& table, c
 
 #ifdef ELUNA
     if (Eluna* e = sWorld->GetEluna())
-        if (!e->OnCommand(m_session ? nullptr : m_session->GetPlayer(), fullcmd.c_str()))
+        if (!e->OnCommand(!m_session ? nullptr : m_session->GetPlayer(), fullcmd.c_str()))
             return true;
 #endif
 
