@@ -90,7 +90,6 @@ bool Eluna::OnCommand(Player* player, const char* text)
             if (!args.empty())
                 mapId = strtol(args.c_str(), nullptr, 10);
 
-            sElunaLoader->LoadScripts();
             if (mapid_reload_cache_only != mapId)
             {
                 if (mapId == mapid_reload_global || mapId == mapid_reload_all)

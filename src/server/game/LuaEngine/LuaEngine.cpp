@@ -36,6 +36,9 @@ void Eluna::_ReloadEluna()
 {
     sWorld->SendServerMessage(SERVER_MSG_STRING, "Reloading Eluna...");
 
+    // Moved from Eluna::OnCommand in the purpose of loading new scripts
+    sElunaLoader->LoadScripts();
+
     // Remove all timed events
     eventMgr->SetStates(LUAEVENT_STATE_ERASE);
 
