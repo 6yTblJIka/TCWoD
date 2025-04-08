@@ -2960,7 +2960,6 @@ namespace LuaGlobalFunctions
     {
         TC_LOG_INFO("misc", "Reloading creature template...");
         sObjectMgr->LoadCreatureTemplates();
-        TC_LOG_INFO("server.loading", "Initialize query data...");
         return 0;
     }
 
