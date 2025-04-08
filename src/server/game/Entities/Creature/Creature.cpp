@@ -699,6 +699,11 @@ void Creature::Update(uint32 diff)
     }
 
     sScriptMgr->OnCreatureUpdate(this, diff);
+
+#ifdef ELUNA
+    if (Eluna* e = GetEluna())
+        e->UpdateAI(this, diff);
+#endif
 }
 
 void Creature::RegenerateMana()
