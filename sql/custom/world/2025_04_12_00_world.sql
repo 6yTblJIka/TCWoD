@@ -1,0 +1,2 @@
+DELETE FROM `command` WHERE `name`='lookup adventure';
+INSERT INTO `command` (`name`, `permission`, `help`) VALUES ('lookup adventure', 442, 'Syntax: .lookup $ID to show the Adventure Journal Entry datas from db2.');

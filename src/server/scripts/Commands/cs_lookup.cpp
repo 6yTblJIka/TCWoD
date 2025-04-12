@@ -54,6 +54,7 @@ public:
 
         static std::vector<ChatCommand> lookupCommandTable =
         {
+            { "adventure",rbac::RBAC_PERM_COMMAND_LOOKUP,          true, &HandleLookupAdventureCommand,     "" },
             { "area",     rbac::RBAC_PERM_COMMAND_LOOKUP_AREA,     true, &HandleLookupAreaCommand,     "" },
             { "creature", rbac::RBAC_PERM_COMMAND_LOOKUP_CREATURE, true, &HandleLookupCreatureCommand, "" },
             { "event",    rbac::RBAC_PERM_COMMAND_LOOKUP_EVENT,    true, &HandleLookupEventCommand,    "" },
@@ -76,6 +77,63 @@ public:
             { "lookup", rbac::RBAC_PERM_COMMAND_LOOKUP,  true, NULL, "", lookupCommandTable },
         };
         return commandTable;
+    }
+
+    static bool HandleLookupAdventureCommand(ChatHandler* handler, char const* args)
+    {
+        if (!*args)
+            return false;
+
+        uint32 id = atoi((char*)args);
+		AdventureJournalEntry const* entry = sDB2Manager.GetAdventureJournalEntry(id);
+        int32 locale = handler->GetSessionDbcLocale();
+        std::ostringstream ss;
+
+        if (!entry)
+        {
+            ss << "Adventure Journal Entry [" << id << "] not exists.";
+            handler->SendSysMessage(ss.str().c_str());
+
+            return true;
+        }
+        
+        handler->PSendSysMessage("Adventure Journal Entry [%u]:", id);
+        handler->PSendSysMessage("Type: %u", entry->Type);
+        handler->PSendSysMessage("PlayerConditionID: %u", entry->PlayerConditionID);
+        handler->PSendSysMessage("Flags: %u", entry->Flags);
+		std::string name = entry->Name->Str[locale];
+        if (!name.empty())
+            handler->PSendSysMessage("Name: %s", name.c_str());
+        std::string desc = entry->Description->Str[locale];
+        if (!desc.empty())
+            handler->PSendSysMessage("Description: %s", desc.c_str());
+        std::string buttext = entry->ButtonText->Str[locale];
+        if (!buttext.empty())
+            handler->PSendSysMessage("ButtonText: %s", buttext.c_str());
+        handler->PSendSysMessage("ButtonActionType: %u", entry->ButtonActionType);
+        handler->PSendSysMessage("TextureFileDataID: %u", entry->TextureFileDataID);
+        handler->PSendSysMessage("LFGDungeonID: %u", entry->LFGDungeonID);
+        handler->PSendSysMessage("QuestID: %u", entry->QuestID);
+        handler->PSendSysMessage("BattlemasterListID: %u", entry->BattlemasterListID);
+        handler->PSendSysMessage("PriorityMin: %u", entry->PriorityMin);
+        handler->PSendSysMessage("PriorityMax: %u", entry->PriorityMax);
+        handler->PSendSysMessage("BonusPlayerConditionID1: %u", entry->BonusPlayerConditionID[0]);
+        handler->PSendSysMessage("BonusPlayerConditionID2: %u", entry->BonusPlayerConditionID[1]);
+        handler->PSendSysMessage("BonusValue1: %u", entry->BonusValue[0]);
+        handler->PSendSysMessage("BonusValue2: %u", entry->BonusValue[1]);
+        handler->PSendSysMessage("ItemID: %u", entry->ItemID);
+        handler->PSendSysMessage("ItemQuantity: %u", entry->ItemQuantity);
+        handler->PSendSysMessage("CurrencyType: %u", entry->CurrencyType);
+        handler->PSendSysMessage("CurrencyQuantity: %u", entry->CurrencyQuantity);
+        std::string rewdesc = entry->RewardDescription->Str[locale];
+        if (!rewdesc.empty())
+            handler->PSendSysMessage("RewardDescription: %s", rewdesc.c_str());
+        handler->PSendSysMessage("UIMapID: %u", entry->UIMapID);
+        std::string cdesc = entry->ContinuedDescription->Str[locale];
+        if (!cdesc.empty())
+            handler->PSendSysMessage("ContinuedDescription: %s", cdesc.c_str());
+
+        return true;
     }
 
     static bool HandleLookupAreaCommand(ChatHandler* handler, char const* args)
