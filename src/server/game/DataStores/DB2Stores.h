@@ -25,6 +25,7 @@
 #include <array>
 
 TC_GAME_API extern DB2Storage<AchievementEntry>                     sAchievementStore;
+TC_GAME_API extern DB2Storage<AdventureJournalEntry>                sAdventureJournalStore;
 TC_GAME_API extern DB2Storage<AuctionHouseEntry>                    sAuctionHouseStore;
 TC_GAME_API extern DB2Storage<BarberShopStyleEntry>                 sBarberShopStyleStore;
 TC_GAME_API extern DB2Storage<BattlePetBreedQualityEntry>           sBattlePetBreedQualityStore;
@@ -176,6 +177,7 @@ public:
     time_t GetHotfixDate(uint32 entry, uint32 type) const;
 
     std::vector<uint32> GetAreasForGroup(uint32 areaGroupId) const;
+	AdventureJournalEntry const* GetAdventureJournalEntry(uint32 id) const;
     static char const* GetBroadcastTextValue(BroadcastTextEntry const* broadcastText, LocaleConstant locale = DEFAULT_LOCALE, uint8 gender = GENDER_MALE, bool forceGender = false);
     CharStartOutfitEntry const* GetCharStartOutfitEntry(uint8 race, uint8 class_, uint8 gender) const;
     uint32 GetPowerIndexByClass(uint32 powerType, uint32 classId) const;
