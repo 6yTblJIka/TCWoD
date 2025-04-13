@@ -564,3 +564,10 @@ void WorldPackets::Quest::CloseAutoAcceptQuest::Read()
 {
     _worldPacket >> QuestID;
 }
+
+WorldPacket const* WorldPackets::Quest::QuestForceRemoved::Write()
+{
+    _worldPacket << uint32(QuestID);
+
+    return &_worldPacket;
+}

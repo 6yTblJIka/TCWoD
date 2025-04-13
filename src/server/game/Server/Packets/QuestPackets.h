@@ -588,6 +588,16 @@ namespace WorldPackets
 
             uint32 QuestID = 0;
         };
+
+        class QuestForceRemoved final : public ServerPacket
+        {
+        public:
+            QuestForceRemoved() : ServerPacket(SMSG_QUEST_FORCE_REMOVED, 4) {}
+
+            WorldPacket const* Write() override;
+
+            uint32 QuestID = 0;
+        };
     }
 }
 
