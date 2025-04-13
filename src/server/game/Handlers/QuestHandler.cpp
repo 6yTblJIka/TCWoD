@@ -210,6 +210,22 @@ void WorldSession::HandleQuestgiverAcceptQuestOpcode(WorldPackets::Quest::QuestG
             if (quest->GetSrcSpell() > 0)
                 _player->CastSpell(_player, quest->GetSrcSpell(), true);
 
+            // NOT TC:
+            if (WorldObject* source = ObjectAccessor::GetWorldObject(*_player, packet.QuestGiverGUID))
+            {
+                if (source->HasQuestForPlayer(_player))
+                {
+                    uint32 textId = _player->GetGossipTextId(source);
+
+                    if (uint32 menuId = _player->PlayerTalkClass->GetGossipMenu().GetMenuId())
+                        textId = _player->GetGossipTextId(menuId, source);
+
+                    _player->PlayerTalkClass->GetQuestMenu().RemoveMenuItem(quest->ID);
+                    _player->PlayerTalkClass->SendGossipMenu(textId, source->GetGUID());
+                }
+            }
+            // :NOT TC
+
             return;
         }
     }
