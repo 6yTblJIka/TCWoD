@@ -750,3 +750,23 @@ void PlayerMenu::AddQuestLevelToTitle(std::string &title, int32 level)
     questTitlePretty << "[" << level << "] " << title;
     title = questTitlePretty.str();
 }
+
+// NOT TC:
+void QuestMenu::RemoveMenuItem(uint32 QuestId)
+{
+    if (!sObjectMgr->GetQuestTemplate(QuestId))
+        return;
+
+    ASSERT(_questMenuItems.size() <= GOSSIP_MAX_MENU_ITEMS);
+
+    for (QuestMenuItemList::iterator i = _questMenuItems.begin(); i != _questMenuItems.end(); ) 
+    {
+        if (i->QuestId == QuestId) 
+        {
+            i = _questMenuItems.erase(i);
+            break;
+        }
+        else
+            ++i;
+    }
+}

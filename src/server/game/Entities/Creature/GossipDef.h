@@ -223,6 +223,7 @@ class TC_GAME_API QuestMenu
         ~QuestMenu();
 
         void AddMenuItem(uint32 QuestId, uint8 Icon);
+        void RemoveMenuItem(uint32 QuestId); // NOT TC
         void ClearMenu();
         uint8 GetMenuItemCount() const{ return uint8(_questMenuItems.size()); }
         bool Empty() const { return _questMenuItems.empty(); }
