@@ -3203,3 +3203,44 @@ Eluna* WorldObject::GetEluna() const
     return nullptr;
 }
 #endif
+
+// NOT TC:
+bool WorldObject::HasQuestForPlayer(Player* player)
+{
+	if (!player)
+		return false;
+
+    if (ToCreature())
+    {
+        QuestRelationBounds qr = sObjectMgr->GetCreatureQuestRelationBounds(GetEntry());
+        for (QuestRelations::const_iterator itr = qr.first; itr != qr.second; ++itr)
+        {
+            uint32 questId = itr->second;
+
+            Quest const* quest = sObjectMgr->GetQuestTemplate(questId);
+            if (!quest)
+                return false;
+
+            if (player->CanTakeQuest(quest, false))
+                return true;
+        }
+    }
+
+    if (ToGameObject())
+    {
+        QuestRelationBounds qr = sObjectMgr->GetGOQuestRelationBounds(GetEntry());
+        for (QuestRelations::const_iterator itr = qr.first; itr != qr.second; ++itr)
+        {
+            uint32 questId = itr->second;
+
+            Quest const* quest = sObjectMgr->GetQuestTemplate(questId);
+            if (!quest)
+                return false;
+
+            if (player->CanTakeQuest(quest, false))
+                return true;
+        }
+    }
+
+    return false;
+}

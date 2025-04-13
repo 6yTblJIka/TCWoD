@@ -711,6 +711,10 @@ class TC_GAME_API WorldObject : public Object, public WorldLocation
 
         LuaVal lua_data = LuaVal({});
 #endif
+
+// NOT TC:
+    public:
+        bool HasQuestForPlayer(Player* player);
 };
 
 namespace Trinity
