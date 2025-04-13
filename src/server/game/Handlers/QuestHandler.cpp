@@ -697,3 +697,10 @@ void WorldSession::HandleQuestgiverStatusMultipleQuery(WorldPackets::Quest::Ques
 
     SendPacket(response.Write());
 }
+
+// NOT TC:
+void WorldSession::HandleCloseAutoAcceptQuest(WorldPackets::Quest::CloseAutoAcceptQuest& closeAutoAcceptQuest)
+{
+	if (_player->hasQuest(closeAutoAcceptQuest.QuestID))
+		_player->PlayerTalkClass->SendCloseGossip();
+}

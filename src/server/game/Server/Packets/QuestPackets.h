@@ -577,6 +577,17 @@ namespace WorldPackets
 
             int32 Count = 0;
         };
+
+        // NOT TC:
+        class CloseAutoAcceptQuest final : public ClientPacket
+        {
+        public:
+            CloseAutoAcceptQuest(WorldPacket&& packet) : ClientPacket(CMSG_QUEST_CLOSE_AUTOACCEPT_QUEST, std::move(packet)) {}
+
+            void Read() override;
+
+            uint32 QuestID = 0;
+        };
     }
 }
 

@@ -722,6 +722,7 @@ enum OpcodeClient : uint32
     CMSG_WRAP_ITEM                                    = 0x3912,
     // NOT TC
     CMSG_ADVENTURE_JOURNAL_OPEN_QUEST                 = 0x3164,
+    CMSG_QUEST_CLOSE_AUTOACCEPT_QUEST                 = 0x34AF,
 };
 
 enum OpcodeServer : uint32

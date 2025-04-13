@@ -794,6 +794,7 @@ void OpcodeTable::Initialize()
 // NOT TC    
     DEFINE_HANDLER(CMSG_ADVENTURE_JOURNAL_OPEN_QUEST,                       STATUS_LOGGEDIN,  PROCESS_THREADUNSAFE, WorldPackets::AdventureJournal::AdventureJournalOpenQuest, &WorldSession::HandleAdventureJournalOpenQuest);
     DEFINE_HANDLER(CMSG_CLOSE_INTERACTION,                                  STATUS_LOGGEDIN,  PROCESS_THREADUNSAFE, WorldPackets::Misc::CloseInteraction, &WorldSession::HandleCloseInteraction);
+    DEFINE_HANDLER(CMSG_QUEST_CLOSE_AUTOACCEPT_QUEST,                       STATUS_LOGGEDIN,  PROCESS_THREADUNSAFE, WorldPackets::Quest::CloseAutoAcceptQuest, &WorldSession::HandleCloseAutoAcceptQuest);
 
 #undef DEFINE_OPCODE_HANDLER_OLD
 #undef DEFINE_HANDLER

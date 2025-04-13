@@ -564,6 +564,8 @@ namespace WorldPackets
         class QuestLogRemoveQuest;
         class QuestPushResult;
         class PushQuestToParty;
+        // NOT TC:
+        class CloseAutoAcceptQuest;
     }
 
     namespace RaF
@@ -1737,6 +1739,8 @@ class TC_GAME_API WorldSession
         void HandleAdventureJournalOpenQuest(WorldPackets::AdventureJournal::AdventureJournalOpenQuest& openAdventureJournalQuest);
         // Misc
         void HandleCloseInteraction(WorldPackets::Misc::CloseInteraction& closeInteraction);
+        // Quest
+        void HandleCloseAutoAcceptQuest(WorldPackets::Quest::CloseAutoAcceptQuest& closeAutoAcceptQuest);
 // :NOT TC
 
         union ConnectToKey

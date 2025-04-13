@@ -558,3 +558,9 @@ WorldPacket const* WorldPackets::Quest::DailyQuestsReset::Write()
 
     return &_worldPacket;
 }
+
+// NOT TC:
+void WorldPackets::Quest::CloseAutoAcceptQuest::Read()
+{
+    _worldPacket >> QuestID;
+}
