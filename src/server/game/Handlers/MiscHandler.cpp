@@ -1165,3 +1165,15 @@ void WorldSession::HandleMountSpecialAnimOpcode(WorldPackets::Misc::MountSpecial
     specialMountAnim.UnitGUID = _player->GetGUID();
     GetPlayer()->SendMessageToSet(specialMountAnim.Write(), false);
 }
+
+void WorldSession::HandleCloseInteraction(WorldPackets::Misc::CloseInteraction& closeInteraction)
+{
+    if (_player->PlayerTalkClass->GetGossipMenu().GetSenderGUID() == closeInteraction.SourceGuid)
+        if (WorldObject* source = ObjectAccessor::GetWorldObject(*_player, closeInteraction.SourceGuid))
+            if (!source->HasQuestForPlayer(_player))
+                _player->PlayerTalkClass->SendCloseGossip();
+
+	// Reset check for Adventure Journal quest
+    if (_player->m_isAcceptingAdventureJournalQuest)
+		_player->m_isAcceptingAdventureJournalQuest = false;
+}

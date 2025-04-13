@@ -626,3 +626,8 @@ WorldPacket const* WorldPackets::Misc::OverrideLight::Write()
 
     return &_worldPacket;
 }
+
+void WorldPackets::Misc::CloseInteraction::Read()
+{
+    _worldPacket >> SourceGuid;
+}

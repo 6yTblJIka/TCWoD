@@ -286,7 +286,6 @@ void OpcodeTable::Initialize()
     DEFINE_HANDLER(CMSG_CLEAR_RAID_MARKER,                                  STATUS_LOGGEDIN,  PROCESS_THREADUNSAFE, WorldPackets::Party::ClearRaidMarker, &WorldSession::HandleClearRaidMarker);
     DEFINE_HANDLER(CMSG_CLEAR_TRADE_ITEM,                                   STATUS_LOGGEDIN,  PROCESS_THREADUNSAFE, WorldPackets::Trade::ClearTradeItem, &WorldSession::HandleClearTradeItemOpcode);
     DEFINE_HANDLER(CMSG_CLIENT_PORT_GRAVEYARD,                              STATUS_LOGGEDIN,  PROCESS_THREADUNSAFE, WorldPackets::Misc::PortGraveyard, &WorldSession::HandlePortGraveyard);
-    DEFINE_HANDLER(CMSG_CLOSE_INTERACTION,                                  STATUS_UNHANDLED, PROCESS_INPLACE,      WorldPackets::Null, &WorldSession::Handle_NULL);
     DEFINE_HANDLER(CMSG_COMMENTATOR_ENABLE,                                 STATUS_UNHANDLED, PROCESS_INPLACE,      WorldPackets::Null, &WorldSession::Handle_NULL);
     DEFINE_HANDLER(CMSG_COMMENTATOR_ENTER_INSTANCE,                         STATUS_UNHANDLED, PROCESS_INPLACE,      WorldPackets::Null, &WorldSession::Handle_NULL);
     DEFINE_HANDLER(CMSG_COMMENTATOR_EXIT_INSTANCE,                          STATUS_UNHANDLED, PROCESS_INPLACE,      WorldPackets::Null, &WorldSession::Handle_NULL);
@@ -794,6 +793,7 @@ void OpcodeTable::Initialize()
 
 // NOT TC    
     DEFINE_HANDLER(CMSG_ADVENTURE_JOURNAL_OPEN_QUEST,                       STATUS_LOGGEDIN,  PROCESS_THREADUNSAFE, WorldPackets::AdventureJournal::AdventureJournalOpenQuest, &WorldSession::HandleAdventureJournalOpenQuest);
+    DEFINE_HANDLER(CMSG_CLOSE_INTERACTION,                                  STATUS_LOGGEDIN,  PROCESS_THREADUNSAFE, WorldPackets::Misc::CloseInteraction, &WorldSession::HandleCloseInteraction);
 
 #undef DEFINE_OPCODE_HANDLER_OLD
 #undef DEFINE_HANDLER

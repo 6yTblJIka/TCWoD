@@ -435,6 +435,8 @@ namespace WorldPackets
         class WorldTeleport;
         class MountSpecial;
         class SetTaxiBenchmarkMode;
+        // NOT TC:
+        class CloseInteraction;
     }
 
     namespace Movement
@@ -1730,9 +1732,12 @@ class TC_GAME_API WorldSession
 
         std::unordered_map<uint32, uint8> const& GetRealmCharacterCounts() const { return _realmCharacterCounts; }
 
-// NOT TC
+// NOT TC:
         // Adventure Journal
         void HandleAdventureJournalOpenQuest(WorldPackets::AdventureJournal::AdventureJournalOpenQuest& openAdventureJournalQuest);
+        // Misc
+        void HandleCloseInteraction(WorldPackets::Misc::CloseInteraction& closeInteraction);
+// :NOT TC
 
         union ConnectToKey
         {

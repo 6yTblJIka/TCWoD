@@ -823,6 +823,17 @@ namespace WorldPackets
             int32 TransitionMilliseconds = 0;
             int32 OverrideLightID = 0;
         };
+
+        // NOT TC
+        class CloseInteraction final : public ClientPacket
+        {
+        public:
+            CloseInteraction(WorldPacket&& packet) : ClientPacket(CMSG_CLOSE_INTERACTION, std::move(packet)) {}
+
+            void Read() override;
+
+            ObjectGuid SourceGuid;
+        };
     }
 }
 
