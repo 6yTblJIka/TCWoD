@@ -2831,6 +2831,11 @@ class TC_GAME_API Player : public Unit, public GridObject<Player>
         uint32 manaBeforeDuel;
 
         WorldLocation _corpseLocation;
+
+// NOT TC
+    public:
+        bool MeetPlayerCondition(uint32 conditionId) const;
+        bool m_isAcceptingAdventureJournalQuest = false;
 };
 
 TC_GAME_API void AddItemsSetItem(Player* player, Item* item);

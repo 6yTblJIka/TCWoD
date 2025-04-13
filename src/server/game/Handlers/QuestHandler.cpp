@@ -129,6 +129,7 @@ void WorldSession::HandleQuestgiverAcceptQuestOpcode(WorldPackets::Quest::QuestG
 
     if (Player* playerQuestObject = object->ToPlayer())
     {
+        if (!_player->m_isAcceptingAdventureJournalQuest) // NOT TC
         if ((_player->GetDivider().IsEmpty() && _player->GetDivider() != packet.QuestGiverGUID) || !playerQuestObject->CanShareQuest(packet.QuestID))
         {
             CLOSE_GOSSIP_CLEAR_DIVIDER();
@@ -178,6 +179,7 @@ void WorldSession::HandleQuestgiverAcceptQuestOpcode(WorldPackets::Quest::QuestG
         if (_player->CanAddQuest(quest, true))
         {
             _player->AddQuestAndCheckCompletion(quest, object);
+			_player->m_isAcceptingAdventureJournalQuest = false; // NOT TC
 
             if (quest->HasFlag(QUEST_FLAGS_PARTY_ACCEPT))
             {

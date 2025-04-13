@@ -720,6 +720,8 @@ enum OpcodeClient : uint32
     CMSG_WORLD_PORT_RESPONSE                          = 0x3578,
     CMSG_WORLD_TELEPORT                               = 0x3562,
     CMSG_WRAP_ITEM                                    = 0x3912,
+    // NOT TC
+    CMSG_ADVENTURE_JOURNAL_OPEN_QUEST                 = 0x3164,
 };
 
 enum OpcodeServer : uint32

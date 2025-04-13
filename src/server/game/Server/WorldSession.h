@@ -81,6 +81,12 @@ namespace WorldPackets
         class GuildSetFocusedAchievement;
     }
 
+    namespace AdventureJournal
+    {
+        class AdventureJournalOpenQuest;
+        class AdventureJournalStartQuest;
+    }
+
     namespace AuctionHouse
     {
         class AuctionHelloRequest;
@@ -1723,6 +1729,10 @@ class TC_GAME_API WorldSession
         void SetRealmListSecret(std::array<uint8, 32> const& secret) { memcpy(_realmListSecret.data(), secret.data(), secret.size()); }
 
         std::unordered_map<uint32, uint8> const& GetRealmCharacterCounts() const { return _realmCharacterCounts; }
+
+// NOT TC
+        // Adventure Journal
+        void HandleAdventureJournalOpenQuest(WorldPackets::AdventureJournal::AdventureJournalOpenQuest& openAdventureJournalQuest);
 
         union ConnectToKey
         {
