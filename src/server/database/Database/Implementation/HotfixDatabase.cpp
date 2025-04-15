@@ -36,9 +36,10 @@ void HotfixDatabaseConnection::DoPrepareStatements()
     PREPARE_LOCALE_STMT(HOTFIX_SEL_ACHIEVEMENT, "SELECT ID, Title_lang, Description_lang, Reward_lang FROM achievement_locale WHERE locale = ?", CONNECTION_SYNCH);
     
     // AdventureJournal.db2
-    PrepareStatement(HOTFIX_SEL_ADVENTURE_JOURNAL, "SELECT ID, Type, PlayerConditionID, Flags, Name, Description, ButtonText, ButtonActionType, TextureFileDataID, LFGDungeonID, QuestID, "
-        "BattlemasterListID, PriorityMin, PriorityMax, BonusPlayerConditionID1, BonusPlayerConditionID2, BonusValue1, BonusValue2, ItemID, ItemQuantity, CurrencyType, WorldMapAreaID, CurrencyQuantity, "
-        "RewardDescription, UIMapID, ContinuedDescription FROM adventure_journal ORDER BY ID DESC", CONNECTION_SYNCH);
+    PrepareStatement(HOTFIX_SEL_ADVENTURE_JOURNAL, "SELECT ID, Type, PlayerConditionID, Flags, Name, Description, ButtonText, ButtonActionType, "
+        "TextureFileDataID, LFGDungeonID, QuestID, BattlemasterListID, PriorityMin, PriorityMax, BonusPlayerConditionID1, BonusPlayerConditionID2, "
+        "BonusValue1, BonusValue2, ItemID, ItemQuantity, CurrencyType, CurrencyQuantity, RewardDescription, UIMapID, ContinuedDescription"
+        " FROM adventure_journal WHERE (`VerifiedBuild` > 0) = ?", CONNECTION_SYNCH);
     PREPARE_LOCALE_STMT(HOTFIX_SEL_ADVENTURE_JOURNAL, "SELECT ID, Name_lang, Description_lang, ButtonText_lang, RewardDescription_lang, ContinuedDescription_lang  FROM adventure_journal_locale WHERE locale = ?", CONNECTION_SYNCH);
 
     // AreaGroupMember.db2

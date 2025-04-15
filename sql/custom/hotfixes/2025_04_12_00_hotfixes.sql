@@ -1,50 +1,54 @@
-/*!40101 SET @OLD_CHARACTER_SET_CLIENT=@@CHARACTER_SET_CLIENT */;
-/*!40101 SET NAMES utf8 */;
-/*!50503 SET NAMES utf8mb4 */;
-/*!40103 SET @OLD_TIME_ZONE=@@TIME_ZONE */;
-/*!40103 SET TIME_ZONE='+00:00' */;
-/*!40014 SET @OLD_FOREIGN_KEY_CHECKS=@@FOREIGN_KEY_CHECKS, FOREIGN_KEY_CHECKS=0 */;
-/*!40101 SET @OLD_SQL_MODE=@@SQL_MODE, SQL_MODE='NO_AUTO_VALUE_ON_ZERO' */;
-/*!40111 SET @OLD_SQL_NOTES=@@SQL_NOTES, SQL_NOTES=0 */;
-
--- Struktúra mentése tábla hotfixes. adventure_journal
-CREATE TABLE IF NOT EXISTS `adventure_journal` (
+DROP TABLE IF EXISTS `adventure_journal`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
+CREATE TABLE `adventure_journal` (
   `ID` int unsigned NOT NULL DEFAULT '0',
-  `Type` int NOT NULL DEFAULT '0',
-  `PlayerConditionID` int unsigned NOT NULL DEFAULT '0',
+  `Type` int unsigned NOT NULL DEFAULT '0',
+  `PlayerConditionID` int NOT NULL DEFAULT '0',
   `Flags` int unsigned NOT NULL DEFAULT '0',
   `Name` text,
   `Description` text,
   `ButtonText` text,
-  `ButtonActionType` int NOT NULL DEFAULT '0',
+  `ButtonActionType` int unsigned NOT NULL DEFAULT '0',
   `TextureFileDataID` int NOT NULL DEFAULT '0',
-  `LFGDungeonID` int NOT NULL DEFAULT '0',
-  `QuestID` int NOT NULL DEFAULT '0',
-  `BattlemasterListID` int NOT NULL DEFAULT '0',
-  `PriorityMin` int NOT NULL DEFAULT '0',
-  `PriorityMax` int NOT NULL DEFAULT '0',
-  `BonusPlayerConditionID1` int NOT NULL DEFAULT '0',
-  `BonusPlayerConditionID2` int NOT NULL DEFAULT '0',
-  `BonusValue1` int NOT NULL DEFAULT '0',
-  `BonusValue2` int NOT NULL DEFAULT '0',
+  `LFGDungeonID` int unsigned NOT NULL DEFAULT '0',
+  `QuestID` int unsigned NOT NULL DEFAULT '0',
+  `BattlemasterListID` int unsigned NOT NULL DEFAULT '0',
+  `PriorityMin` int unsigned NOT NULL DEFAULT '0',
+  `PriorityMax` int unsigned NOT NULL DEFAULT '0',
+  `BonusPlayerConditionID1` int unsigned NOT NULL DEFAULT '0',
+  `BonusPlayerConditionID2` int unsigned NOT NULL DEFAULT '0',
+  `BonusValue1` int unsigned NOT NULL DEFAULT '0',
+  `BonusValue2` int unsigned NOT NULL DEFAULT '0',
   `ItemID` int NOT NULL DEFAULT '0',
-  `ItemQuantity` int NOT NULL DEFAULT '0',
-  `CurrencyType` int NOT NULL DEFAULT '0',
-  `WorldMapAreaID` int DEFAULT '0',
-  `CurrencyQuantity` int NOT NULL DEFAULT '0',
+  `ItemQuantity` int unsigned NOT NULL DEFAULT '0',
+  `CurrencyType` int unsigned NOT NULL DEFAULT '0',
+  `CurrencyQuantity` int unsigned NOT NULL DEFAULT '0',
   `RewardDescription` text,
-  `UIMapID` int NOT NULL DEFAULT '0',
-  `ContinuedDescription` text CHARACTER SET utf8mb3 COLLATE utf8mb3_general_ci,
-  `VerifiedBuild` smallint NOT NULL DEFAULT '0',
-  PRIMARY KEY (`ID`)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8mb3;
+  `UIMapID` int unsigned NOT NULL DEFAULT '0',
+  `ContinuedDescription` text,
+  `VerifiedBuild` int NOT NULL DEFAULT '0',
+  PRIMARY KEY (`ID`,`VerifiedBuild`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
 
--- Tábla adatainak mentése hotfixes.adventure_journal: 0 rows
+--
+-- Dumping data for table `adventure_journal`
+--
+
+LOCK TABLES `adventure_journal` WRITE;
 /*!40000 ALTER TABLE `adventure_journal` DISABLE KEYS */;
 /*!40000 ALTER TABLE `adventure_journal` ENABLE KEYS */;
+UNLOCK TABLES;
 
--- Struktúra mentése tábla hotfixes. adventure_journal_locale
-CREATE TABLE IF NOT EXISTS `adventure_journal_locale` (
+--
+-- Table structure for table `adventure_journal_locale`
+--
+
+DROP TABLE IF EXISTS `adventure_journal_locale`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
+CREATE TABLE `adventure_journal_locale` (
   `ID` int unsigned NOT NULL DEFAULT '0',
   `locale` varchar(4) NOT NULL,
   `Name_lang` text,
@@ -52,16 +56,27 @@ CREATE TABLE IF NOT EXISTS `adventure_journal_locale` (
   `ButtonText_lang` text,
   `RewardDescription_lang` text,
   `ContinuedDescription_lang` text,
-  `VerifiedBuild` smallint NOT NULL DEFAULT '0',
-  PRIMARY KEY (`ID`,`locale`)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8mb3;
+  `VerifiedBuild` int NOT NULL DEFAULT '0',
+  PRIMARY KEY (`ID`,`locale`,`VerifiedBuild`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci
+/*!50500 PARTITION BY LIST  COLUMNS(locale)
+(PARTITION deDE VALUES IN ('deDE') ENGINE = InnoDB,
+ PARTITION esES VALUES IN ('esES') ENGINE = InnoDB,
+ PARTITION esMX VALUES IN ('esMX') ENGINE = InnoDB,
+ PARTITION frFR VALUES IN ('frFR') ENGINE = InnoDB,
+ PARTITION itIT VALUES IN ('itIT') ENGINE = InnoDB,
+ PARTITION koKR VALUES IN ('koKR') ENGINE = InnoDB,
+ PARTITION ptBR VALUES IN ('ptBR') ENGINE = InnoDB,
+ PARTITION ruRU VALUES IN ('ruRU') ENGINE = InnoDB,
+ PARTITION zhCN VALUES IN ('zhCN') ENGINE = InnoDB,
+ PARTITION zhTW VALUES IN ('zhTW') ENGINE = InnoDB) */;
+/*!40101 SET character_set_client = @saved_cs_client */;
 
--- Tábla adatainak mentése hotfixes.adventure_journal_locale: 0 rows
+--
+-- Dumping data for table `adventure_journal_locale`
+--
+
+LOCK TABLES `adventure_journal_locale` WRITE;
 /*!40000 ALTER TABLE `adventure_journal_locale` DISABLE KEYS */;
 /*!40000 ALTER TABLE `adventure_journal_locale` ENABLE KEYS */;
-
-/*!40103 SET TIME_ZONE=IFNULL(@OLD_TIME_ZONE, 'system') */;
-/*!40101 SET SQL_MODE=IFNULL(@OLD_SQL_MODE, '') */;
-/*!40014 SET FOREIGN_KEY_CHECKS=IFNULL(@OLD_FOREIGN_KEY_CHECKS, 1) */;
-/*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
-/*!40111 SET SQL_NOTES=IFNULL(@OLD_SQL_NOTES, 1) */;
+UNLOCK TABLES;
