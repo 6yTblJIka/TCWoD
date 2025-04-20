@@ -565,3 +565,27 @@ WorldPacket const* WorldPackets::Item::ItemUpgradeResult::Write()
 
     return &_worldPacket;
 }
+
+void WorldPackets::Item::ChangeBagSlotFlag::Read()
+{
+    _worldPacket >> BagIndex;
+    _worldPacket >> FlagToChange;
+    On = _worldPacket.ReadBit();
+}
+
+void WorldPackets::Item::ChangeBankBagSlotFlag::Read()
+{
+    _worldPacket >> BagIndex;
+    _worldPacket >> FlagToChange;
+    On = _worldPacket.ReadBit();
+}
+
+void WorldPackets::Item::SetBackpackAutosortDisabled::Read()
+{
+    Disable = _worldPacket.ReadBit();
+}
+
+void WorldPackets::Item::SetBankAutosortDisabled::Read()
+{
+    Disable = _worldPacket.ReadBit();
+}

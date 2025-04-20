@@ -22,6 +22,7 @@
 #include "ObjectGuid.h"
 #include "WorldSession.h"
 #include "G3D/Vector3.h"
+#include "ItemPackets.h"
 #include "Object.h"
 #include "Unit.h"
 #include "Player.h"
@@ -833,6 +834,23 @@ namespace WorldPackets
             void Read() override;
 
             ObjectGuid SourceGuid;
+        };
+        class DisplayToast final : public ServerPacket
+        {
+        public:
+            DisplayToast() : ServerPacket(SMSG_DISPLAY_TOAST) {}
+
+            WorldPacket const* Write() override;
+
+            uint32 Quantity = 0;
+            ::DisplayToastMethod DisplayToastMethod = ::DisplayToastMethod::DoNotDisplay;
+            bool Mailed = false;
+            DisplayToastType Type = DisplayToastType::Money;
+            Item::ItemInstance Item;
+            bool BonusRoll = false;
+            int32 LootSpec = 0;
+            ::Gender Gender = GENDER_NONE;
+            uint32 CurrencyID = 0;
         };
     }
 }

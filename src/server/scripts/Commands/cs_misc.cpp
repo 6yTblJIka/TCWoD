@@ -1276,6 +1276,12 @@ public:
             player->SendNewItem(item, count, false, true);
             if (player != playerTarget)
                 playerTarget->SendNewItem(item, count, true, false);
+
+            // NOT TC
+            if (player != playerTarget)
+                playerTarget->SendDisplayToast(itemId, DisplayToastType::NewItem, false, count, DisplayToastMethod::Loot, item);
+            else
+                player->SendDisplayToast(itemId, DisplayToastType::NewItem, false, count, DisplayToastMethod::Loot, item);
         }
 
         if (noSpaceForCount > 0)

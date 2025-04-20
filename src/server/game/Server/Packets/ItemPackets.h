@@ -550,6 +550,74 @@ namespace WorldPackets
         };
 
         ByteBuffer& operator>>(ByteBuffer& data, InvUpdate& invUpdate);
+
+        class ChangeBagSlotFlag final : public ClientPacket
+        {
+        public:
+            explicit ChangeBagSlotFlag(WorldPacket&& packet) : ClientPacket(CMSG_CHANGE_BAG_SLOT_FLAG, std::move(packet)) {}
+
+            void Read() override;
+
+            uint32 BagIndex = 0;
+            uint32 FlagToChange = 0;
+            bool On = false;
+        };
+
+        class ChangeBankBagSlotFlag final : public ClientPacket
+        {
+        public:
+            explicit ChangeBankBagSlotFlag(WorldPacket&& packet) : ClientPacket(CMSG_SET_BANK_BAG_SLOT_FLAG, std::move(packet)) {}
+
+            void Read() override;
+
+            uint32 BagIndex = 0;
+            uint32 FlagToChange = 0;
+            bool On = false;
+        };
+
+        class SetBackpackAutosortDisabled final : public ClientPacket
+        {
+        public:
+            explicit SetBackpackAutosortDisabled(WorldPacket&& packet) : ClientPacket(CMSG_SET_BACKPACK_AUTOSORT_DISABLED, std::move(packet)) {}
+
+            void Read() override;
+
+            bool Disable = false;
+        };
+
+        class SetBankAutosortDisabled final : public ClientPacket
+        {
+        public:
+            explicit SetBankAutosortDisabled(WorldPacket&& packet) : ClientPacket(CMSG_SET_BANK_AUTOSORT_DISABLED, std::move(packet)) {}
+
+            void Read() override;
+
+            bool Disable = false;
+        };
+
+        class SortBags final : public ClientPacket
+        {
+        public:
+            SortBags(WorldPacket&& packet) : ClientPacket(CMSG_SORT_BAGS, std::move(packet)) {}
+
+            void Read() override {}
+        };
+
+        class SortBankBags final : public ClientPacket
+        {
+        public:
+            SortBankBags(WorldPacket&& packet) : ClientPacket(CMSG_SORT_BANK_BAGS, std::move(packet)) {}
+
+            void Read() override {}
+        };
+
+        class BagCleanupFinished final : public ServerPacket
+        {
+        public:
+            BagCleanupFinished() : ServerPacket(SMSG_BAG_CLEANUP_FINISHED, 0) {}
+
+            WorldPacket const* Write() override { return &_worldPacket; }
+        };
     }
 }
 

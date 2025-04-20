@@ -1086,6 +1086,46 @@ enum PlayerLogXPReason : uint8
     LOG_XP_REASON_NO_KILL = 1
 };
 
+enum class DisplayToastType : uint8
+{
+    NewItem     = 0,
+    NewCurrency = 1,
+    Money       = 2,
+    Honor       = 3
+};
+
+enum class DisplayToastMethod : uint8
+{
+    DoNotDisplay            = 0,
+    Loot                    = 1,
+    PetBattle               = 2,
+    PersonalLoot            = 3,
+    GarrisonMissionLoot     = 4,
+    QuestUpgrade            = 5,
+    QuestUpgradeEpic        = 6,
+    Shipment                = 7,
+    GarrisonMissionSalvage  = 8,
+    PvPFactionReward        = 9,
+    GarrisonCurrency        = 10,
+    LessAwesomeLoot         = 11,
+    UpgradedLoot            = 12,
+    LegendaryLoot           = 13,
+    InvasionLoot            = 14,
+    Default                 = 15,
+    QuestComplete           = 16,
+    RatedPvPReward          = 17,
+    CorruptedLoot           = 19
+};
+
+enum class BagSlotFlags : uint32
+{
+    None = 0x00,
+    DisableAutoSort = 0x01,
+    PriorityEquipment = 0x02,
+    PriorityConsumables = 0x04,
+    PriorityTradeGoods = 0x08,
+};
+
 class Player;
 
 /// Holder for Battleground data
@@ -1587,6 +1627,7 @@ class TC_GAME_API Player : public Unit, public GridObject<Player>
         void SendPushToPartyResponse(Player* player, QuestPushReason reason) const;
         void SendQuestUpdateAddCredit(Quest const* quest, ObjectGuid guid, QuestObjective const& obj, uint16 count) const;
         void SendQuestUpdateAddPlayer(Quest const* quest, uint16 newCount, uint32 required) const;
+        void SendDisplayToast(uint32 entry, DisplayToastType type, bool isBonusRoll, uint32 quantity, DisplayToastMethod method, Item* item = nullptr) const;
 
         ObjectGuid GetDivider() const { return m_divider; }
         void SetDivider(ObjectGuid guid) { m_divider = guid; }
@@ -2753,6 +2794,13 @@ class TC_GAME_API Player : public Unit, public GridObject<Player>
         uint8 m_grantableLevels;
 
         std::array<std::unique_ptr<CUFProfile>, MAX_CUF_PROFILES> _CUFProfiles;
+
+		// Bag sorting
+        bool HasBankBagAnyPriorityFlag(uint8 bagSlot);
+        bool HasBagAnyPriorityFlag(uint8 bagSlot);
+        void StoreItemInBag(Item* item);
+        void StoreItemInBank(Item* item);
+        void StoreItemInReagentBank(Item* item);
 
     private:
         // internal common parts for CanStore/StoreItem functions

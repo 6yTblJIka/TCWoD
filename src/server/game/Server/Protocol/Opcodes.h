@@ -1526,6 +1526,7 @@ enum OpcodeServer : uint32
     SMSG_SHOW_TRADE_SKILL_RESPONSE                    = 0x272F,
     SMSG_SOCKET_GEMS                                  = 0x26E7,
     SMSG_SOR_START_EXPERIENCE_INCOMPLETE              = 0x2576,
+    SMSG_BAG_CLEANUP_FINISHED                         = 0x2785,
     SMSG_SPECIAL_MOUNT_ANIM                           = 0x2649,
     SMSG_SPELL_ABSORB_LOG                             = 0x2B9C,
     SMSG_SPELL_CHANNEL_START                          = 0x2BB3,

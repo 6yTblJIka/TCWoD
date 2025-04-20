@@ -631,3 +631,30 @@ void WorldPackets::Misc::CloseInteraction::Read()
 {
     _worldPacket >> SourceGuid;
 }
+
+WorldPacket const* WorldPackets::Misc::DisplayToast::Write()
+{
+    _worldPacket << uint32(Quantity);
+    _worldPacket << uint8(static_cast<std::underlying_type_t<::DisplayToastMethod>>(DisplayToastMethod));
+
+    _worldPacket.WriteBit(Mailed);
+    _worldPacket.WriteBits(static_cast<std::underlying_type_t<::DisplayToastType>>(Type), 2);
+
+    switch (Type)
+    {
+    case DisplayToastType::NewItem:
+        _worldPacket.WriteBit(BonusRoll);
+        _worldPacket << Item;
+        _worldPacket << int32(LootSpec);
+        _worldPacket << int32(Gender);
+        break;
+    case DisplayToastType::NewCurrency:
+        _worldPacket.FlushBits();
+        _worldPacket << uint32(CurrencyID);
+        break;
+    default:
+        break;
+    }
+
+    return &_worldPacket;
+}

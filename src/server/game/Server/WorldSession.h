@@ -379,6 +379,13 @@ namespace WorldPackets
         class UseCritterItem;
         class UpgradeItem;
         class SocketGems;
+        class ChangeBagSlotFlag;
+        class ChangeBankBagSlotFlag;
+        class SetBackpackAutosortDisabled;
+        class SetBankAutosortDisabled;
+        class SortBags;
+        class SortBankBags;
+        class BagCleanUpFinished;
         struct ItemInstance;
     }
 
@@ -1733,6 +1740,14 @@ class TC_GAME_API WorldSession
         void SetRealmListSecret(std::array<uint8, 32> const& secret) { memcpy(_realmListSecret.data(), secret.data(), secret.size()); }
 
         std::unordered_map<uint32, uint8> const& GetRealmCharacterCounts() const { return _realmCharacterCounts; }
+
+        // Bag sorting
+        void HandleChangeBagSlotFlag(WorldPackets::Item::ChangeBagSlotFlag& changeBagSlotFlag);
+        void HandleChangeBankBagSlotFlag(WorldPackets::Item::ChangeBankBagSlotFlag& changeBankBagSlotFlag);
+        void HandleSetBackpackAutosortDisabled(WorldPackets::Item::SetBackpackAutosortDisabled& setBackpackAutosortDisabled);
+        void HandleSetBankAutosortDisabled(WorldPackets::Item::SetBankAutosortDisabled& setBankAutosortDisabled);
+        void HandleSortBags(WorldPackets::Item::SortBags& sortBags);
+        void HandleSortBankBags(WorldPackets::Item::SortBankBags& sortBankBags);
 
 // NOT TC:
         // Adventure Journal

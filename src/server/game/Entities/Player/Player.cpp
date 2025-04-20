@@ -14481,6 +14481,8 @@ void Player::RewardQuest(Quest const* quest, uint32 reward, Object* questGiver, 
 
         if (moneyRew > 0)
             UpdateCriteria(CRITERIA_TYPE_MONEY_FROM_QUEST_REWARD, uint32(moneyRew));
+
+        SendDisplayToast(0, DisplayToastType::Money, false, moneyRew, DisplayToastMethod::QuestComplete);
     }
 
     // honor reward
@@ -16451,7 +16453,10 @@ bool Player::LoadFromDB(ObjectGuid guid, SQLQueryHolder *holder)
     // 51      52      53      54      55      56      57      58           59         60          61          62             63
     //"health, power1, power2, power3, power4, power5, power6, instance_id, speccount, activespec, lootSpecId, exploredZones, equipmentCache, "
     // 64           65          66               67              68
-    //"knownTitles, actionBars, grantableLevels, raidDifficulty, legacyRaidDifficulty FROM characters WHERE guid = '%u'", guid);
+    //"knownTitles, actionBars, grantableLevels, raidDifficulty, legacyRaidDifficulty,
+    //       69             70              71            72               73                 74                 75                 76                 77                  78                 79                  80
+    // "bagSlotFlags1, bagSlotFlags2, bagSlotFlags3, bagSlotFlags4, bankBagSlotFlags1, bankBagSlotFlags2, bankBagSlotFlags3, bankBagSlotFlags4, bankBagSlotFlags5, bankBagSlotFlags6, bankBagSlotFlags7, insertItemsLeftToRight "
+    // FROM characters WHERE guid = '%u'", guid);
     PreparedQueryResult result = holder->GetPreparedResult(PLAYER_LOGIN_QUERY_LOAD_FROM);
     if (!result)
     {
@@ -16598,6 +16603,24 @@ bool Player::LoadFromDB(ObjectGuid guid, SQLQueryHolder *holder)
     SetDungeonDifficultyID(CheckLoadedDungeonDifficultyID(Difficulty(fields[44].GetUInt8())));
     SetRaidDifficultyID(CheckLoadedRaidDifficultyID(Difficulty(fields[67].GetUInt8())));
     SetLegacyRaidDifficultyID(CheckLoadedLegacyRaidDifficultyID(Difficulty(fields[68].GetUInt8())));
+
+    // Bag sorting
+    //       69             70              71            72             73                    74               75                  76                  77                 78                79                    80
+    // "bagSlotFlags1, bagSlotFlags2, bagSlotFlags3, bagSlotFlags4, bankBagSlotFlags1, bankBagSlotFlags2, bankBagSlotFlags3, bankBagSlotFlags4, bankBagSlotFlags5, bankBagSlotFlags6, bankBagSlotFlags7, insertItemsLeftToRight "
+    SetUInt32Value(PLAYER_FIELD_BAG_SLOT_FLAGS, fields[69].GetUInt32());
+    SetUInt32Value(PLAYER_FIELD_BAG_SLOT_FLAGS+1, fields[70].GetUInt32());
+    SetUInt32Value(PLAYER_FIELD_BAG_SLOT_FLAGS+2, fields[71].GetUInt32());
+    SetUInt32Value(PLAYER_FIELD_BAG_SLOT_FLAGS+3, fields[72].GetUInt32());
+
+    SetUInt32Value(PLAYER_FIELD_BANK_BAG_SLOT_FLAGS, fields[73].GetUInt32());
+    SetUInt32Value(PLAYER_FIELD_BANK_BAG_SLOT_FLAGS+1, fields[74].GetUInt32());
+    SetUInt32Value(PLAYER_FIELD_BANK_BAG_SLOT_FLAGS+2, fields[75].GetUInt32());
+    SetUInt32Value(PLAYER_FIELD_BANK_BAG_SLOT_FLAGS+3, fields[76].GetUInt32());
+    SetUInt32Value(PLAYER_FIELD_BANK_BAG_SLOT_FLAGS+4, fields[77].GetUInt32());
+    SetUInt32Value(PLAYER_FIELD_BANK_BAG_SLOT_FLAGS+5, fields[78].GetUInt32());
+    SetUInt32Value(PLAYER_FIELD_BANK_BAG_SLOT_FLAGS+6, fields[79].GetUInt32());
+
+    SetUInt32Value(PLAYER_FIELD_INSERT_ITEMS_LEFT_TO_RIGHT, fields[80].GetUInt32());
 
     std::string taxi_nodes = fields[43].GetString();
 
@@ -18862,6 +18885,22 @@ void Player::SaveToDB(bool create /*=false*/)
 
         stmt->setUInt8(index++, GetByteValue(PLAYER_FIELD_BYTES, PLAYER_FIELD_BYTES_OFFSET_ACTION_BAR_TOGGLES));
         stmt->setUInt32(index, m_grantableLevels);
+
+        // Bag sorting
+        stmt->setUInt32(index, GetUInt32Value(PLAYER_FIELD_BAG_SLOT_FLAGS));
+        stmt->setUInt32(index, GetUInt32Value(PLAYER_FIELD_BAG_SLOT_FLAGS + 1));
+        stmt->setUInt32(index, GetUInt32Value(PLAYER_FIELD_BAG_SLOT_FLAGS + 2));
+        stmt->setUInt32(index, GetUInt32Value(PLAYER_FIELD_BAG_SLOT_FLAGS + 3));
+
+        stmt->setUInt32(index, GetUInt32Value(PLAYER_FIELD_BANK_BAG_SLOT_FLAGS));
+        stmt->setUInt32(index, GetUInt32Value(PLAYER_FIELD_BANK_BAG_SLOT_FLAGS + 1));
+        stmt->setUInt32(index, GetUInt32Value(PLAYER_FIELD_BANK_BAG_SLOT_FLAGS + 2));
+        stmt->setUInt32(index, GetUInt32Value(PLAYER_FIELD_BANK_BAG_SLOT_FLAGS + 3));
+        stmt->setUInt32(index, GetUInt32Value(PLAYER_FIELD_BANK_BAG_SLOT_FLAGS + 4));
+        stmt->setUInt32(index, GetUInt32Value(PLAYER_FIELD_BANK_BAG_SLOT_FLAGS + 5));
+        stmt->setUInt32(index, GetUInt32Value(PLAYER_FIELD_BANK_BAG_SLOT_FLAGS + 6));
+
+        stmt->setUInt32(index, GetUInt32Value(PLAYER_FIELD_INSERT_ITEMS_LEFT_TO_RIGHT));
     }
     else
     {
@@ -19008,6 +19047,23 @@ void Player::SaveToDB(bool create /*=false*/)
         stmt->setUInt32(index++, m_grantableLevels);
 
         stmt->setUInt8(index++, IsInWorld() && !GetSession()->PlayerLogout() ? 1 : 0);
+
+        // Bag sorting
+        stmt->setUInt32(index++, GetUInt32Value(PLAYER_FIELD_BAG_SLOT_FLAGS));
+        stmt->setUInt32(index++, GetUInt32Value(PLAYER_FIELD_BAG_SLOT_FLAGS + 1));
+        stmt->setUInt32(index++, GetUInt32Value(PLAYER_FIELD_BAG_SLOT_FLAGS + 2));
+        stmt->setUInt32(index++, GetUInt32Value(PLAYER_FIELD_BAG_SLOT_FLAGS + 3));
+
+        stmt->setUInt32(index++, GetUInt32Value(PLAYER_FIELD_BANK_BAG_SLOT_FLAGS));
+        stmt->setUInt32(index++, GetUInt32Value(PLAYER_FIELD_BANK_BAG_SLOT_FLAGS + 1));
+        stmt->setUInt32(index++, GetUInt32Value(PLAYER_FIELD_BANK_BAG_SLOT_FLAGS + 2));
+        stmt->setUInt32(index++, GetUInt32Value(PLAYER_FIELD_BANK_BAG_SLOT_FLAGS + 3));
+        stmt->setUInt32(index++, GetUInt32Value(PLAYER_FIELD_BANK_BAG_SLOT_FLAGS + 4));
+        stmt->setUInt32(index++, GetUInt32Value(PLAYER_FIELD_BANK_BAG_SLOT_FLAGS + 5));
+        stmt->setUInt32(index++, GetUInt32Value(PLAYER_FIELD_BANK_BAG_SLOT_FLAGS + 6));
+
+        stmt->setUInt32(index++, GetUInt32Value(PLAYER_FIELD_INSERT_ITEMS_LEFT_TO_RIGHT));
+
         // Index
         stmt->setUInt64(index, GetGUID().GetCounter());
     }
@@ -26586,4 +26642,248 @@ bool Player::MeetPlayerCondition(uint32 conditionId) const
             return false;
 
     return true;
+}
+
+void Player::SendDisplayToast(uint32 entry, DisplayToastType type, bool isBonusRoll, uint32 quantity, DisplayToastMethod method, Item* item /*= nullptr*/) const
+{
+    WorldPackets::Misc::DisplayToast displayToast;
+    displayToast.Quantity = quantity;
+    displayToast.DisplayToastMethod = method;
+    displayToast.Type = type;
+
+    switch (type)
+    {
+    case DisplayToastType::NewItem:
+    {
+        if (!item)
+            return;
+
+        displayToast.BonusRoll = isBonusRoll;
+        displayToast.Item.Initialize(item);
+        displayToast.LootSpec = 0; // loot spec that was selected when loot was generated (not at loot time)
+        displayToast.Gender = Gender(getGender());
+        break;
+    }
+    case DisplayToastType::NewCurrency:
+        displayToast.CurrencyID = entry;
+        break;
+    default:
+        break;
+    }
+
+    SendDirectMessage(displayToast.Write());
+}
+
+bool Player::HasBagAnyPriorityFlag(uint8 bagSlot)
+{
+    if ((GetUInt32Value(PLAYER_FIELD_BAG_SLOT_FLAGS + bagSlot) & uint32(BagSlotFlags::PriorityConsumables)) != 0)
+        return true;
+    if ((GetUInt32Value(PLAYER_FIELD_BAG_SLOT_FLAGS + bagSlot) & uint32(BagSlotFlags::PriorityEquipment)) != 0)
+        return true;
+    if ((GetUInt32Value(PLAYER_FIELD_BAG_SLOT_FLAGS + bagSlot) & uint32(BagSlotFlags::PriorityTradeGoods)) != 0)
+        return true;
+
+    return false;
+}
+
+bool Player::HasBankBagAnyPriorityFlag(uint8 bagSlot)
+{
+    if ((GetUInt32Value(PLAYER_FIELD_BANK_BAG_SLOT_FLAGS + bagSlot) & uint32(BagSlotFlags::PriorityConsumables)) != 0)
+        return true;
+    if ((GetUInt32Value(PLAYER_FIELD_BANK_BAG_SLOT_FLAGS + bagSlot) & uint32(BagSlotFlags::PriorityEquipment)) != 0)
+        return true;
+    if ((GetUInt32Value(PLAYER_FIELD_BANK_BAG_SLOT_FLAGS + bagSlot) & uint32(BagSlotFlags::PriorityTradeGoods)) != 0)
+        return true;
+
+    return false;
+}
+
+void Player::StoreItemInBag(Item* item)
+{
+    if (!item)
+        return;
+    uint32 itemQuality = item->GetQuality();
+    uint32 itemClass = item->GetTemplate()->GetClass();
+    ItemPosCountVec dest;
+    //Then we check all the bags + inventory. But we don't want to store items in flagged bags
+
+    //First we prioritize the bag with Priority flags
+    for (uint8 i = INVENTORY_SLOT_BAG_START; i < INVENTORY_SLOT_BAG_END; i++)
+    {
+        Bag* pbag = GetBagByPos(i);
+        if (pbag)
+        {
+            if ((GetUInt32Value(PLAYER_FIELD_BAG_SLOT_FLAGS + i - INVENTORY_SLOT_BAG_START) & uint32(BagSlotFlags::PriorityEquipment)) != 0
+                && (itemClass == ITEM_CLASS_ARMOR || itemClass == ITEM_CLASS_WEAPON))
+            {
+                if (CanStoreItem(i, NULL_SLOT, dest, item, false) == EQUIP_ERR_OK && !(dest.size() == 1 && dest[0].pos == item->GetPos()))
+                {
+                    StoreItem(dest, item, true);
+                    return;
+                }
+            }
+            if ((GetUInt32Value(PLAYER_FIELD_BAG_SLOT_FLAGS + i - INVENTORY_SLOT_BAG_START) & uint32(BagSlotFlags::PriorityConsumables)) != 0
+                && itemClass == ITEM_CLASS_CONSUMABLE)
+            {
+                if (CanStoreItem(i, NULL_SLOT, dest, item, false) == EQUIP_ERR_OK && !(dest.size() == 1 && dest[0].pos == item->GetPos()))
+                {
+                    StoreItem(dest, item, true);
+                    return;
+                }
+            }                
+            if ((GetUInt32Value(PLAYER_FIELD_BAG_SLOT_FLAGS + i - INVENTORY_SLOT_BAG_START) & uint32(BagSlotFlags::PriorityTradeGoods)) != 0
+                && itemClass == ITEM_CLASS_TRADE_GOODS)
+            {
+                if (CanStoreItem(i, NULL_SLOT, dest, item, false) == EQUIP_ERR_OK && !(dest.size() == 1 && dest[0].pos == item->GetPos()))
+                {
+                    StoreItem(dest, item, true);
+                    return;
+                }
+            }
+        }
+    }
+
+    if (CanStoreItem(INVENTORY_SLOT_BAG_0, NULL_SLOT, dest, item, false) == EQUIP_ERR_OK && !(dest.size() == 1 && dest[0].pos == item->GetPos()))
+    {
+        StoreItem(dest, item, true);
+        return;
+    }
+
+    for (uint8 i = INVENTORY_SLOT_BAG_START; i < INVENTORY_SLOT_BAG_END; i++)
+    {
+        Bag* pbag = GetBagByPos(i);
+        if (pbag)
+        {
+            if (HasBagAnyPriorityFlag(i - INVENTORY_SLOT_BAG_START)) //to ignore the flagged bags
+                continue;
+            if (CanStoreItem(i, NULL_SLOT, dest, item, false) == EQUIP_ERR_OK && !(dest.size() == 1 && dest[0].pos == item->GetPos()))
+            {
+                StoreItem(dest, item, true);
+                return;
+            }
+        }
+    }
+
+    //In case we don't have any place in other bags we store in all the remaining bags
+    if (CanStoreItem(INVENTORY_SLOT_BAG_0, NULL_SLOT, dest, item, false) == EQUIP_ERR_OK && !(dest.size() == 1 && dest[0].pos == item->GetPos()))
+    {
+        StoreItem(dest, item, true);
+        return;
+    }
+
+    for (uint8 i = INVENTORY_SLOT_BAG_START; i < INVENTORY_SLOT_BAG_END; i++)
+    {
+        Bag* pbag = GetBagByPos(i);
+        if (pbag)
+        {
+            if (CanStoreItem(i, NULL_SLOT, dest, item, false) == EQUIP_ERR_OK && !(dest.size() == 1 && dest[0].pos == item->GetPos()))
+            {
+                StoreItem(dest, item, true);
+                return;
+            }
+        }
+    }
+}
+
+void Player::StoreItemInBank(Item* item)
+{
+    if (!item)
+        return;
+
+    uint32 itemQuality = item->GetQuality();
+    uint32 itemClass = item->GetTemplate()->GetClass();
+    ItemPosCountVec dest;
+
+    //Then we check all the bags + inventory. But we don't want to store items in flagged bags
+        //First we prioritize the bag with Priority flags
+    for (uint8 i = BANK_SLOT_BAG_START; i < BANK_SLOT_BAG_END; ++i)
+    {
+        Bag* pBag = GetBagByPos(i);
+        if (pBag)
+        {
+            if ((GetUInt32Value(PLAYER_FIELD_BANK_BAG_SLOT_FLAGS + i - BANK_SLOT_BAG_START) & uint32(BagSlotFlags::DisableAutoSort)) != 0)
+                continue;
+            if ((GetUInt32Value(PLAYER_FIELD_BANK_BAG_SLOT_FLAGS + i - BANK_SLOT_BAG_START) & uint32(BagSlotFlags::PriorityEquipment)) != 0
+                && (itemClass == ITEM_CLASS_ARMOR || itemClass == ITEM_CLASS_WEAPON))
+            {
+                if (CanBankItem(i, NULL_SLOT, dest, item, false) == EQUIP_ERR_OK && !(dest.size() == 1 && dest[0].pos == item->GetPos()))
+                {
+                    BankItem(dest, item, true);
+                    return;
+                }
+            }
+            if ((GetUInt32Value(PLAYER_FIELD_BANK_BAG_SLOT_FLAGS + i - BANK_SLOT_BAG_START) & uint32(BagSlotFlags::PriorityConsumables)) != 0
+                && itemClass == ITEM_CLASS_CONSUMABLE)
+            {
+                if (CanBankItem(i, NULL_SLOT, dest, item, false) == EQUIP_ERR_OK && !(dest.size() == 1 && dest[0].pos == item->GetPos()))
+                {
+                    BankItem(dest, item, true);
+                    return;
+                }
+            }
+            if ((GetUInt32Value(PLAYER_FIELD_BANK_BAG_SLOT_FLAGS + i - BANK_SLOT_BAG_START) & uint32(BagSlotFlags::PriorityTradeGoods)) != 0
+                && itemClass == ITEM_CLASS_TRADE_GOODS)
+            {
+                if (CanBankItem(i, NULL_SLOT, dest, item, false) == EQUIP_ERR_OK && !(dest.size() == 1 && dest[0].pos == item->GetPos()))
+                {
+                    BankItem(dest, item, true);
+                    return;
+                }
+            }
+        }
+    }
+    if (CanBankItem(INVENTORY_SLOT_BAG_0, NULL_SLOT, dest, item, false) == EQUIP_ERR_OK && !(dest.size() == 1 && dest[0].pos == item->GetPos()))
+    {
+        BankItem(dest, item, true);
+        return;
+    }
+
+    for (uint8 i = BANK_SLOT_BAG_START; i < BANK_SLOT_BAG_END; ++i)
+    {
+        Bag* pBag = GetBagByPos(i);
+        if (pBag)
+        {
+            if (HasBankBagAnyPriorityFlag(i - BANK_SLOT_BAG_START))
+                continue;
+
+            if (CanBankItem(i, NULL_SLOT, dest, item, false) == EQUIP_ERR_OK && !(dest.size() == 1 && dest[0].pos == item->GetPos()))
+            {
+                BankItem(dest, item, true);
+                return;
+            }
+        }
+    }
+
+    //In case we don't have any place in other bags we store in all the remaining bags
+    if (CanBankItem(INVENTORY_SLOT_BAG_0, NULL_SLOT, dest, item, false) == EQUIP_ERR_OK && !(dest.size() == 1 && dest[0].pos == item->GetPos()))
+    {
+        BankItem(dest, item, true);
+        return;
+    }
+
+    for (uint8 i = BANK_SLOT_BAG_START; i < BANK_SLOT_BAG_END; ++i)
+    {
+        Bag* pBag = GetBagByPos(i);
+        if (pBag)
+        {
+            if (CanBankItem(i, NULL_SLOT, dest, item, false) == EQUIP_ERR_OK && !(dest.size() == 1 && dest[0].pos == item->GetPos()))
+            {
+                BankItem(dest, item, true);
+                return;
+            }
+        }
+    }
+}
+
+void Player::StoreItemInReagentBank(Item* item)
+{
+    if (!item)
+        return;
+
+    ItemPosCountVec dest;
+    if (CanBankItem(NULL_BAG, NULL_SLOT, dest, item, false) == EQUIP_ERR_OK && !(dest.size() == 1 && dest[0].pos == item->GetPos()))
+    {
+        BankItem(dest, item, true);
+        return;
+    }
 }

@@ -1354,3 +1354,251 @@ void WorldSession::HandleUpgradeItem(WorldPackets::Item::UpgradeItem& upgradeIte
     item->SetState(ITEM_CHANGED, _player);
     _player->ModifyCurrency(itemUpgradeEntry->CurrencyID, -int32(itemUpgradeEntry->CurrencyCost));
 }
+
+void WorldSession::HandleChangeBagSlotFlag(WorldPackets::Item::ChangeBagSlotFlag& changeBagSlotFlag)
+{
+	if (changeBagSlotFlag.BagIndex >= 4) // 4 is the max bag PLAYER_FIELD_BAG_SLOT_FLAGS 0-3
+        return;
+    
+    if (changeBagSlotFlag.On)
+        _player->SetUInt32Value(PLAYER_FIELD_BAG_SLOT_FLAGS + changeBagSlotFlag.BagIndex, uint32(changeBagSlotFlag.FlagToChange));
+    else
+        _player->SetUInt32Value(PLAYER_FIELD_BAG_SLOT_FLAGS + changeBagSlotFlag.BagIndex, uint32(0));
+}
+
+void WorldSession::HandleChangeBankBagSlotFlag(WorldPackets::Item::ChangeBankBagSlotFlag& changeBankBagSlotFlag)
+{
+    if (changeBankBagSlotFlag.BagIndex >= 7) // 7 is the max bag PLAYER_FIELD_BANK_BAG_SLOT_FLAGS 0-6
+        return;
+
+    if (changeBankBagSlotFlag.On)
+        _player->SetUInt32Value(PLAYER_FIELD_BANK_BAG_SLOT_FLAGS + changeBankBagSlotFlag.BagIndex, uint32(changeBankBagSlotFlag.FlagToChange));
+    else
+        _player->SetUInt32Value(PLAYER_FIELD_BANK_BAG_SLOT_FLAGS + changeBankBagSlotFlag.BagIndex, uint32(0));
+}
+
+void WorldSession::HandleSetBackpackAutosortDisabled(WorldPackets::Item::SetBackpackAutosortDisabled& setBackpackAutosortDisabled)
+{
+}
+
+void WorldSession::HandleSetBankAutosortDisabled(WorldPackets::Item::SetBankAutosortDisabled& setBankAutosortDisabled)
+{
+}
+
+void WorldSession::HandleSortBags(WorldPackets::Item::SortBags& /*sortBags*/)
+{
+    std::multimap<uint64, Item*> items;
+    uint32 sortOrderHi;
+    uint32 sortOrderLo;
+    uint64 sortOrder;
+
+    // basic bag
+    for (uint8 slot = INVENTORY_SLOT_ITEM_START; slot < INVENTORY_SLOT_ITEM_END; slot++)
+    {
+        if (Item* item = _player->GetItemByPos(INVENTORY_SLOT_BAG_0, slot))
+        {
+            if (item->GetEntry() == ITEM_HEARTHSTONE || item->GetEntry() == ITEM_GARRISON_HEARTHSTONE
+                || item->GetEntry() == ITEM_DALARAN_HEARTHSTONE || item->GetEntry() == ITEM_FLIGHT_MASTER_WHISTLE)
+            {
+                sortOrderLo = item->GetEntry();
+                sortOrderHi = ITEM_SORT_SPECIAL_ITEM << 24;
+            }
+            else
+            {
+                switch (item->GetTemplate()->GetClass())
+                {
+                case (ITEM_CLASS_TRADE_GOODS):
+                    sortOrderLo = (MAX_ITEM_LEVEL - item->GetItemLevel(_player));
+                    sortOrderHi = ITEM_SORT_TRADE_GOODS << 24;
+                    break;
+                case (ITEM_CLASS_ARMOR):
+                case (ITEM_CLASS_WEAPON):
+                    sortOrderLo = (MAX_ITEM_LEVEL - item->GetItemLevel(_player));
+                    sortOrderHi = ITEM_SORT_EQUIPMENT << 24;
+                    break;
+                case (ITEM_CLASS_CONSUMABLE):
+                    sortOrderLo = item->GetEntry();
+                    sortOrderHi = ITEM_SORT_CONSUMABLE << 24 | item->GetTemplate()->GetClass() << 16 | (MAX_ITEM_SUBCLASS_CONSUMABLE - item->GetTemplate()->GetSubClass());
+                    break;
+                default:
+                    sortOrderLo = (UINT32_MAX - item->GetEntry());
+                    sortOrderHi = ITEM_SORT_OTHER << 24 | item->GetTemplate()->GetClass() << 16 | (MAX_ITEM_SUBCLASS_CONSUMABLE - item->GetTemplate()->GetSubClass());
+                    break;
+                }
+            }
+            sortOrder = (static_cast<uint64>(sortOrderHi) << 32) | sortOrderLo;
+            items.insert(std::make_pair(sortOrder, item));
+            _player->RemoveItem(INVENTORY_SLOT_BAG_0, slot, true);
+        }
+    }
+
+    // other bags
+    for (uint8 i = INVENTORY_SLOT_BAG_START; i < INVENTORY_SLOT_BAG_END; i++)
+    {
+        if (Bag* bag = _player->GetBagByPos(i))
+        {
+            if ((_player->GetUInt32Value((PLAYER_FIELD_BAG_SLOT_FLAGS + i) - INVENTORY_SLOT_BAG_START) & uint32(BagSlotFlags::DisableAutoSort)) == 0)
+            {
+                for (uint32 j = 0; j < bag->GetBagSize(); j++)
+                {
+                    if (Item* item = _player->GetItemByPos(i, j))
+                    {
+                        if (item->GetEntry() == ITEM_HEARTHSTONE || item->GetEntry() == ITEM_GARRISON_HEARTHSTONE
+                            || item->GetEntry() == ITEM_DALARAN_HEARTHSTONE || item->GetEntry() == ITEM_FLIGHT_MASTER_WHISTLE)
+                        {
+                            sortOrderLo = item->GetEntry();
+                            sortOrderHi = ITEM_SORT_SPECIAL_ITEM << 24;
+                        }
+                        else
+                        {
+                            switch (item->GetTemplate()->GetClass())
+                            {
+                            case (ITEM_CLASS_TRADE_GOODS):
+                                sortOrderLo = (MAX_ITEM_LEVEL - item->GetItemLevel(_player));
+                                sortOrderHi = ITEM_SORT_TRADE_GOODS << 24;
+                                if ((_player->GetUInt32Value(PLAYER_FIELD_BAG_SLOT_FLAGS + (i - INVENTORY_SLOT_BAG_START)) & uint32(BagSlotFlags::PriorityTradeGoods)) != 0)
+                                    continue; // item is in right place
+                                break;
+                            case (ITEM_CLASS_ARMOR):
+                            case (ITEM_CLASS_WEAPON):
+                                sortOrderLo = (MAX_ITEM_LEVEL - item->GetItemLevel(_player));
+                                sortOrderHi = ITEM_SORT_EQUIPMENT << 24;
+                                if ((_player->GetUInt32Value(PLAYER_FIELD_BAG_SLOT_FLAGS + (i - INVENTORY_SLOT_BAG_START)) & uint32(BagSlotFlags::PriorityEquipment)) != 0)
+                                    continue; // item is in right place
+                                break;
+                            case (ITEM_CLASS_CONSUMABLE):
+                                sortOrderLo = item->GetEntry();
+                                sortOrderHi = ITEM_SORT_CONSUMABLE << 24 | item->GetTemplate()->GetClass() << 16 | (MAX_ITEM_SUBCLASS_CONSUMABLE - item->GetTemplate()->GetSubClass());
+                                if ((_player->GetUInt32Value(PLAYER_FIELD_BAG_SLOT_FLAGS + (i - INVENTORY_SLOT_BAG_START)) & uint32(BagSlotFlags::PriorityConsumables)) != 0)
+                                    continue; // item is in right place
+                                break;
+                            default:
+                                sortOrderLo = (UINT32_MAX - item->GetEntry());
+                                sortOrderHi = ITEM_SORT_OTHER << 24 | item->GetTemplate()->GetClass() << 16 | (MAX_ITEM_SUBCLASS_CONSUMABLE - item->GetTemplate()->GetSubClass());
+                                break;
+                            }
+                        }
+                        sortOrder = (static_cast<uint64>(sortOrderHi) << 32) | sortOrderLo;
+                        items.insert(std::make_pair(sortOrder, item));
+                        _player->RemoveItem(i, j, true);
+                    }
+                }
+            }
+        }
+    }
+
+    for (auto itr = std::begin(items); itr != std::end(items); ++itr)
+        _player->StoreItemInBag(itr->second);
+
+    // Placeholder to prevent completely locking out bags clientside
+    SendPacket(WorldPackets::Item::BagCleanupFinished().Write());
+}
+
+void WorldSession::HandleSortBankBags(WorldPackets::Item::SortBankBags& /*sortBankBags*/)
+{
+    std::multimap<uint64, Item*> items;
+    uint32 sortOrderHi;
+    uint32 sortOrderLo;
+    uint64 sortOrder;
+
+    // basic bank
+    for (uint8 slot = BANK_SLOT_ITEM_START; slot < BANK_SLOT_ITEM_END; slot++)
+    {
+        if (Item* item = _player->GetItemByPos(INVENTORY_SLOT_BAG_0, slot))
+        {
+            if (item->GetEntry() == ITEM_HEARTHSTONE || item->GetEntry() == ITEM_GARRISON_HEARTHSTONE
+                || item->GetEntry() == ITEM_DALARAN_HEARTHSTONE || item->GetEntry() == ITEM_FLIGHT_MASTER_WHISTLE)
+            {
+                sortOrderLo = item->GetEntry();
+                sortOrderHi = ITEM_SORT_SPECIAL_ITEM << 24;
+            }
+            else
+            {
+                switch (item->GetTemplate()->GetClass())
+                {
+                case (ITEM_CLASS_TRADE_GOODS):
+                    sortOrderLo = (MAX_ITEM_LEVEL - item->GetItemLevel(_player));
+                    sortOrderHi = ITEM_SORT_TRADE_GOODS << 24;
+                    break;
+                case (ITEM_CLASS_ARMOR):
+                case (ITEM_CLASS_WEAPON):
+                    sortOrderLo = (MAX_ITEM_LEVEL - item->GetItemLevel(_player));
+                    sortOrderHi = ITEM_SORT_EQUIPMENT << 24;
+                    break;
+                case (ITEM_CLASS_CONSUMABLE):
+                    sortOrderLo = item->GetEntry();
+                    sortOrderHi = ITEM_SORT_CONSUMABLE << 24 | item->GetTemplate()->GetClass() << 16 | (MAX_ITEM_SUBCLASS_CONSUMABLE - item->GetTemplate()->GetSubClass());
+                    break;
+                default:
+                    sortOrderLo = (UINT32_MAX - item->GetEntry());
+                    sortOrderHi = ITEM_SORT_OTHER << 24 | item->GetTemplate()->GetClass() << 16 | (MAX_ITEM_SUBCLASS_CONSUMABLE - item->GetTemplate()->GetSubClass());
+                    break;
+                }
+            }
+            sortOrder = (static_cast<uint64>(sortOrderHi) << 32) | sortOrderLo;
+            items.insert(std::make_pair(sortOrder, item));
+            _player->RemoveItem(INVENTORY_SLOT_BAG_0, slot, true);
+        }
+    }
+
+    // other bags in bank
+    for (uint8 i = BANK_SLOT_BAG_START; i < BANK_SLOT_BAG_END; i++)
+    {
+        if (Bag* bag = _player->GetBagByPos(i))
+        {
+            if ((_player->GetUInt32Value((PLAYER_FIELD_BANK_BAG_SLOT_FLAGS + i) - BANK_SLOT_BAG_START) & uint32(BagSlotFlags::DisableAutoSort)) == 0)
+            {
+                for (uint32 j = 0; j < bag->GetBagSize(); j++)
+                {
+                    if (Item* item = _player->GetItemByPos(i, j))
+                    {
+                        if (item->GetEntry() == ITEM_HEARTHSTONE || item->GetEntry() == ITEM_GARRISON_HEARTHSTONE
+                            || item->GetEntry() == ITEM_DALARAN_HEARTHSTONE || item->GetEntry() == ITEM_FLIGHT_MASTER_WHISTLE)
+                        {
+                            sortOrderLo = item->GetEntry();
+                            sortOrderHi = ITEM_SORT_SPECIAL_ITEM << 24;
+                        }
+                        else
+                        {
+                            switch (item->GetTemplate()->GetClass())
+                            {
+                            case (ITEM_CLASS_TRADE_GOODS):
+                                sortOrderLo = (MAX_ITEM_LEVEL - item->GetItemLevel(_player));
+                                sortOrderHi = ITEM_SORT_TRADE_GOODS << 24;
+                                if ((_player->GetUInt32Value(PLAYER_FIELD_BANK_BAG_SLOT_FLAGS + (i - BANK_SLOT_BAG_START)) & uint32(BagSlotFlags::PriorityTradeGoods)) != 0)
+                                    continue; // item is in right place
+                                break;
+                            case (ITEM_CLASS_ARMOR):
+                            case (ITEM_CLASS_WEAPON):
+                                sortOrderLo = (MAX_ITEM_LEVEL - item->GetItemLevel(_player));
+                                sortOrderHi = ITEM_SORT_EQUIPMENT << 24;
+                                if ((_player->GetUInt32Value(PLAYER_FIELD_BANK_BAG_SLOT_FLAGS + (i - BANK_SLOT_BAG_START)) & uint32(BagSlotFlags::PriorityEquipment)) != 0)
+                                    continue; // item is in right place
+                                break;
+                            case (ITEM_CLASS_CONSUMABLE):
+                                sortOrderLo = item->GetEntry();
+                                sortOrderHi = ITEM_SORT_CONSUMABLE << 24 | item->GetTemplate()->GetClass() << 16 | (MAX_ITEM_SUBCLASS_CONSUMABLE - item->GetTemplate()->GetSubClass());
+                                if ((_player->GetUInt32Value(PLAYER_FIELD_BANK_BAG_SLOT_FLAGS + (i - BANK_SLOT_BAG_START)) & uint32(BagSlotFlags::PriorityConsumables)) != 0)
+                                    continue; // item is in right place
+                                break;
+                            default:
+                                sortOrderLo = (UINT32_MAX - item->GetEntry());
+                                sortOrderHi = ITEM_SORT_OTHER << 24 | item->GetTemplate()->GetClass() << 16 | (MAX_ITEM_SUBCLASS_CONSUMABLE - item->GetTemplate()->GetSubClass());
+                                break;
+                            }
+                        }
+                        sortOrder = (static_cast<uint64>(sortOrderHi) << 32) | sortOrderLo;
+                        items.insert(std::make_pair(sortOrder, item));
+                        _player->RemoveItem(i, j, true);
+                    }
+                }
+            }
+        }
+    }
+
+    for (auto itr = std::begin(items); itr != std::end(items); ++itr)
+        _player->StoreItemInBank(itr->second);
+
+    // Placeholder to prevent completely locking out bags clientside
+    SendPacket(WorldPackets::Item::BagCleanupFinished().Write());
+}
