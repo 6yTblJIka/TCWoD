@@ -1117,6 +1117,15 @@ enum class DisplayToastMethod : uint8
     CorruptedLoot           = 19
 };
 
+enum class BagSlotFlags : uint32
+{
+    None = 0x00,
+    DisableAutoSort = 0x01,
+    PriorityEquipment = 0x02,
+    PriorityConsumables = 0x04,
+    PriorityTradeGoods = 0x08,
+};
+
 class Player;
 
 /// Holder for Battleground data
@@ -2785,6 +2794,13 @@ class TC_GAME_API Player : public Unit, public GridObject<Player>
         uint8 m_grantableLevels;
 
         std::array<std::unique_ptr<CUFProfile>, MAX_CUF_PROFILES> _CUFProfiles;
+
+		// Bag sorting
+        bool HasBankBagAnyPriorityFlag(uint8 bagSlot);
+        bool HasBagAnyPriorityFlag(uint8 bagSlot);
+        void StoreItemInBag(Item* item);
+        void StoreItemInBank(Item* item);
+        void StoreItemInReagentBank(Item* item);
 
     private:
         // internal common parts for CanStore/StoreItem functions

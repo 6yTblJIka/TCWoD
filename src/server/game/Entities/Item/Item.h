@@ -233,6 +233,16 @@ enum ItemModifier
     MAX_ITEM_MODIFIERS
 };
 
+// Enum used in ItemHandler for the inventory sorting
+enum ItemSortInventory
+{
+    ITEM_SORT_SPECIAL_ITEM = 0,
+    ITEM_SORT_EQUIPMENT = 1,
+    ITEM_SORT_CONSUMABLE = 2,
+    ITEM_SORT_TRADE_GOODS = 3,
+    ITEM_SORT_OTHER = 4,
+};
+
 #define MAX_ITEM_SPELLS 5
 
 bool ItemCanGoIntoBag(ItemTemplate const* proto, ItemTemplate const* pBagProto);

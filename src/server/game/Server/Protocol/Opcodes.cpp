@@ -225,7 +225,7 @@ void OpcodeTable::Initialize()
     DEFINE_HANDLER(CMSG_CAST_SPELL,                                         STATUS_LOGGEDIN,  PROCESS_THREADSAFE,   WorldPackets::Spells::CastSpell, &WorldSession::HandleCastSpellOpcode);
     DEFINE_HANDLER(CMSG_CHALLENGE_MODE_REQUEST_LEADERS,                     STATUS_UNHANDLED, PROCESS_INPLACE,      WorldPackets::Null, &WorldSession::Handle_NULL);
     DEFINE_HANDLER(CMSG_CHALLENGE_MODE_REQUEST_MAP_STATS,                   STATUS_UNHANDLED, PROCESS_INPLACE,      WorldPackets::Null, &WorldSession::Handle_NULL);
-    DEFINE_HANDLER(CMSG_CHANGE_BAG_SLOT_FLAG,                               STATUS_UNHANDLED, PROCESS_INPLACE,      WorldPackets::Null, &WorldSession::Handle_NULL);
+    DEFINE_HANDLER(CMSG_CHANGE_BAG_SLOT_FLAG,                               STATUS_LOGGEDIN,  PROCESS_INPLACE,      WorldPackets::Item::ChangeBagSlotFlag, &WorldSession::HandleChangeBagSlotFlag);
     DEFINE_HANDLER(CMSG_CHANGE_MONUMENT_APPEARANCE,                         STATUS_UNHANDLED, PROCESS_INPLACE,      WorldPackets::Null, &WorldSession::Handle_NULL);
     DEFINE_HANDLER(CMSG_CHANGE_SUB_GROUP,                                   STATUS_LOGGEDIN,  PROCESS_INPLACE,      WorldPackets::Party::ChangeSubGroup, &WorldSession::HandleChangeSubGroupOpcode);
     DEFINE_HANDLER(CMSG_CHARACTER_RENAME_REQUEST,                           STATUS_AUTHED,    PROCESS_THREADUNSAFE, WorldPackets::Character::CharacterRenameRequest, &WorldSession::HandleCharRenameOpcode);
@@ -676,9 +676,9 @@ void OpcodeTable::Initialize()
     DEFINE_HANDLER(CMSG_SET_ACTIVE_VOICE_CHANNEL,                           STATUS_UNHANDLED, PROCESS_THREADUNSAFE, WorldPackets::Voice::SetActiveVoiceChannel, &WorldSession::HandleSetActiveVoiceChannel);
     DEFINE_HANDLER(CMSG_SET_ADVANCED_COMBAT_LOGGING,                        STATUS_LOGGEDIN,  PROCESS_INPLACE,      WorldPackets::ClientConfig::SetAdvancedCombatLogging, &WorldSession::HandleSetAdvancedCombatLogging);
     DEFINE_HANDLER(CMSG_SET_ASSISTANT_LEADER,                               STATUS_LOGGEDIN,  PROCESS_THREADUNSAFE, WorldPackets::Party::SetAssistantLeader, &WorldSession::HandleSetAssistantLeaderOpcode);
-    DEFINE_HANDLER(CMSG_SET_BACKPACK_AUTOSORT_DISABLED,                     STATUS_UNHANDLED, PROCESS_INPLACE,      WorldPackets::Null, &WorldSession::Handle_NULL);
-    DEFINE_HANDLER(CMSG_SET_BANK_AUTOSORT_DISABLED,                         STATUS_UNHANDLED, PROCESS_INPLACE,      WorldPackets::Null, &WorldSession::Handle_NULL);
-    DEFINE_HANDLER(CMSG_SET_BANK_BAG_SLOT_FLAG,                             STATUS_UNHANDLED, PROCESS_INPLACE,      WorldPackets::Null, &WorldSession::Handle_NULL);
+    DEFINE_HANDLER(CMSG_SET_BACKPACK_AUTOSORT_DISABLED,                     STATUS_LOGGEDIN,  PROCESS_INPLACE,      WorldPackets::Item::SetBackpackAutosortDisabled, &WorldSession::HandleSetBackpackAutosortDisabled);
+    DEFINE_HANDLER(CMSG_SET_BANK_AUTOSORT_DISABLED,                         STATUS_LOGGEDIN,  PROCESS_INPLACE,      WorldPackets::Item::SetBankAutosortDisabled, &WorldSession::HandleSetBankAutosortDisabled);
+    DEFINE_HANDLER(CMSG_SET_BANK_BAG_SLOT_FLAG,                             STATUS_LOGGEDIN,  PROCESS_INPLACE,      WorldPackets::Item::ChangeBankBagSlotFlag, &WorldSession::HandleChangeBankBagSlotFlag);
     DEFINE_HANDLER(CMSG_SET_CONTACT_NOTES,                                  STATUS_LOGGEDIN,  PROCESS_THREADUNSAFE, WorldPackets::Social::SetContactNotes, &WorldSession::HandleSetContactNotesOpcode);
     DEFINE_HANDLER(CMSG_SET_CURRENCY_FLAGS,                                 STATUS_UNHANDLED, PROCESS_INPLACE,      WorldPackets::Null, &WorldSession::Handle_NULL);
     DEFINE_HANDLER(CMSG_SET_DIFFICULTY_ID,                                  STATUS_UNHANDLED, PROCESS_INPLACE,      WorldPackets::Null, &WorldSession::Handle_NULL);
@@ -717,8 +717,8 @@ void OpcodeTable::Initialize()
     DEFINE_HANDLER(CMSG_SIGN_PETITION,                                      STATUS_LOGGEDIN,  PROCESS_THREADUNSAFE, WorldPackets::Petition::SignPetition, &WorldSession::HandleSignPetition);
     DEFINE_HANDLER(CMSG_SILENCE_PARTY_TALKER,                               STATUS_UNHANDLED, PROCESS_INPLACE,      WorldPackets::Null, &WorldSession::Handle_NULL);
     DEFINE_HANDLER(CMSG_SOCKET_GEMS,                                        STATUS_LOGGEDIN,  PROCESS_THREADUNSAFE, WorldPackets::Item::SocketGems, &WorldSession::HandleSocketGems);
-    DEFINE_HANDLER(CMSG_SORT_BAGS,                                          STATUS_UNHANDLED, PROCESS_INPLACE,      WorldPackets::Null, &WorldSession::Handle_NULL);
-    DEFINE_HANDLER(CMSG_SORT_BANK_BAGS,                                     STATUS_UNHANDLED, PROCESS_INPLACE,      WorldPackets::Null, &WorldSession::Handle_NULL);
+    DEFINE_HANDLER(CMSG_SORT_BAGS,                                          STATUS_LOGGEDIN,  PROCESS_INPLACE,      WorldPackets::Item::SortBags, &WorldSession::HandleSortBags);
+    DEFINE_HANDLER(CMSG_SORT_BANK_BAGS,                                     STATUS_LOGGEDIN,  PROCESS_INPLACE,      WorldPackets::Item::SortBankBags, &WorldSession::HandleSortBankBags);
     DEFINE_HANDLER(CMSG_SORT_REAGENT_BANK_BAGS,                             STATUS_UNHANDLED, PROCESS_INPLACE,      WorldPackets::Null, &WorldSession::Handle_NULL);
     DEFINE_HANDLER(CMSG_SPELL_CLICK,                                        STATUS_LOGGEDIN,  PROCESS_THREADUNSAFE, WorldPackets::Spells::SpellClick, &WorldSession::HandleSpellClick);
     DEFINE_HANDLER(CMSG_SPIRIT_HEALER_ACTIVATE,                             STATUS_LOGGEDIN,  PROCESS_THREADUNSAFE, WorldPackets::NPC::SpiritHealerActivate, &WorldSession::HandleSpiritHealerActivate);
@@ -1605,6 +1605,7 @@ void OpcodeTable::Initialize()
     DEFINE_SERVER_OPCODE_HANDLER(SMSG_SHOW_TRADE_SKILL_RESPONSE,               STATUS_UNHANDLED,    CONNECTION_TYPE_REALM);
     DEFINE_SERVER_OPCODE_HANDLER(SMSG_SOCKET_GEMS,                             STATUS_NEVER,        CONNECTION_TYPE_INSTANCE);
     DEFINE_SERVER_OPCODE_HANDLER(SMSG_SOR_START_EXPERIENCE_INCOMPLETE,         STATUS_UNHANDLED,    CONNECTION_TYPE_REALM);
+    DEFINE_SERVER_OPCODE_HANDLER(SMSG_BAG_CLEANUP_FINISHED,                    STATUS_NEVER,        CONNECTION_TYPE_INSTANCE);
     DEFINE_SERVER_OPCODE_HANDLER(SMSG_SPECIAL_MOUNT_ANIM,                      STATUS_NEVER,        CONNECTION_TYPE_INSTANCE);
     DEFINE_SERVER_OPCODE_HANDLER(SMSG_SPELL_ABSORB_LOG,                        STATUS_UNHANDLED,    CONNECTION_TYPE_INSTANCE);
     DEFINE_SERVER_OPCODE_HANDLER(SMSG_SPELL_CHANNEL_START,                     STATUS_NEVER,        CONNECTION_TYPE_INSTANCE);
